@@ -1,0 +1,9 @@
+[theme]
+base = "light"
+primaryColor = "#1D4E89"          # navy — senada header dashboard
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F0F4F8"
+textColor = "#1A1A2E"
+
+[browser]
+gatherUsageStats = false

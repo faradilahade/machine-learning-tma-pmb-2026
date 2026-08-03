@@ -1,0 +1,24 @@
+# ============================================================
+# JANGAN PERNAH DI-COMMIT — berisi kredensial database internal
+# ============================================================
+config.yaml
+.streamlit/secrets.toml
+
+# Data mentah hasil ekstraksi database internal (tidak dipakai dashboard;
+# regenerasi dengan: python run_pipeline.py di jaringan internal)
+data/raw/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# IDE / OS
+.vscode/
+.idea/
+.ipynb_checkpoints/
+Thumbs.db
+.DS_Store

@@ -1,0 +1,98 @@
+# ============================================================
+# KONFIGURASI DEPLOY (Streamlit Community Cloud) — TANPA KREDENSIAL
+# Subdit OP Bendungan dan Danau, Dit. Bina OP, Ditjen SDA
+#
+# Dipakai otomatis oleh src/utils.load_config() bila config.yaml
+# (berisi kredensial database, TIDAK ikut repo) tidak ditemukan.
+# Dashboard hanya MEMBACA hasil pipeline (parquet/xlsx) yang sudah
+# di-commit — tidak pernah menyentuh database.
+# ============================================================
+
+# Di cloud tidak ada akses jaringan internal PU -> "dummy".
+# (Pipeline tidak dijalankan di cloud; nilai ini hanya pelengkap skema.)
+mode: "dummy"
+
+# Kredensial sengaja dikosongkan — isi hanya di config.yaml lokal.
+database:
+  host:     ""
+  port:     5432
+  dbname:   ""
+  user:     ""
+  password: ""
+
+# Nama tabel sumber di skema rawdata
+tables:
+  tma:           "rawdata.sinbad_bendungan_tma"
+  inflow:        "rawdata.sinbad_bendungan_inflow"
+  storage_curve: "rawdata.sinbad_bendungan_storagecurve"
+  outflow:       "rawdata.sinbad_bendungan_outflow"
+
+# Nama kolom SESUAI SKEMA ASLI (verifikasi DBeaver 2026-07-30)
+columns:
+  id_bendungan:   "id"
+  waktu:          "timestamp"
+  tma:            "tma"
+  inflow:         "inflow"
+  elevasi_curve:  "tma"
+  volume_curve:   "volume"
+  periode_curve:  "periode"
+  sync_curve:     "sync_date"
+  outflow_komponen:
+    - "outflow_turbin"
+    - "outflow_abaku"
+    - "outflow_aindustri"
+    - "outflow_irigasi"
+    - "outflow_limpas"
+    - "outflow_pemeliharaan"
+
+id_mapping: "strip_prefix"
+
+# File referensi BON A/B + RTOW + ketersediaan/kebutuhan air
+bon:
+  file_bon:     "data_bon/data_bon_a_bon_b_rtow_ketersediaan_kebutuhan_air.xlsx"
+  sheet_bon_a:        "bon a"
+  sheet_bon_b:        "bon b"
+  sheet_rtow:         "rtow"
+  sheet_ketersediaan: "ketersediaan_air"
+  sheet_kebutuhan:    "kebutuhan_air"
+  file_daftar:  "data_bon/daftar_bendungan.csv"
+  file_format_rtow:  "data_bon/fromat-rtow.csv"
+  file_sifat_musim:  "data_bon/sifat_musim.csv"
+  csv_sep:      ";"
+
+# Rentang data historis
+periode:
+  awal:  "2018-01-01"
+  akhir: "2026-07-31"
+
+# Parameter QC
+qc:
+  batas_perubahan_harian_m: 3.0
+  metode_interpolasi: "linear"
+  max_gap_interpolasi: 7
+  min_bulan_data: 24
+  batas_outflow_m3s: 10000
+
+# Parameter model LSTM
+model:
+  input_tahun: 1
+  hidden_units: 64
+  dropout: 0.2
+  epochs: 200
+  batch_size: 64
+  learning_rate: 0.001
+  patience: 20
+  seed: 42
+  input_bulan: 12
+  output_bulan: 5
+
+# Prediksi
+prediksi:
+  bulan_awal: "2026-08"
+  bulan_akhir: "2026-12"
+
+# Output
+output:
+  dir_prediksi: "output/prediksi"
+  dir_model:    "output/models"
+  dir_grafik:   "output/grafik"

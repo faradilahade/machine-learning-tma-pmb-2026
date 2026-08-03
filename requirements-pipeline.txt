@@ -1,0 +1,7 @@
+# Dependensi LENGKAP untuk menjalankan pipeline end-to-end secara lokal
+# (ekstraksi PostgreSQL SINBAD + QC + training LSTM + prediksi):
+#   pip install -r requirements-pipeline.txt
+-r requirements.txt
+sqlalchemy>=2.0
+psycopg2-binary     # koneksi PostgreSQL SINBAD (jaringan internal PU)
+tensorflow-cpu>=2.15

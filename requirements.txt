@@ -1,0 +1,14 @@
+# Dependensi DASHBOARD (dibaca Streamlit Community Cloud saat deploy).
+# Untuk menjalankan pipeline lengkap (ekstraksi DB + training LSTM):
+#   pip install -r requirements-pipeline.txt
+streamlit>=1.40
+pandas>=2.0
+numpy
+pyyaml
+pyarrow             # baca parquet hasil pipeline
+plotly
+matplotlib
+pillow              # ekspor grafik ke JPG
+openpyxl            # baca file referensi BON (xlsx)
+xlsxwriter          # penulisan Excel berformat (laporan multi-sheet dashboard)
+jinja2              # pewarnaan tabel (pandas Styler) di dashboard

@@ -1,0 +1,1489 @@
+{
+  "skala": {
+    "BD001": {
+      "tma_min": 221.474,
+      "tma_max": 229.034,
+      "inflow_min": 0.0,
+      "inflow_max": 0.284,
+      "format": "15 Harian"
+    },
+    "BD002": {
+      "tma_min": 240.836,
+      "tma_max": 248.724,
+      "inflow_min": 0.0,
+      "inflow_max": 303.514,
+      "format": "15 Harian"
+    },
+    "BD003": {
+      "tma_min": 182.632,
+      "tma_max": 185.118,
+      "inflow_min": 0.0,
+      "inflow_max": 4.673,
+      "format": "15 Harian"
+    },
+    "BD004": {
+      "tma_min": 200.223,
+      "tma_max": 203.941,
+      "inflow_min": 0.0,
+      "inflow_max": 0.367,
+      "format": "15 Harian"
+    },
+    "BD005": {
+      "tma_min": 219.035,
+      "tma_max": 224.033,
+      "inflow_min": 0.0,
+      "inflow_max": 0.472,
+      "format": "15 Harian"
+    },
+    "BD006": {
+      "tma_min": 118.004,
+      "tma_max": 119.082,
+      "inflow_min": 0.021,
+      "inflow_max": 3.566,
+      "format": "15 Harian"
+    },
+    "BD007": {
+      "tma_min": 162.819,
+      "tma_max": 165.828,
+      "inflow_min": 0.0,
+      "inflow_max": 0.216,
+      "format": "15 Harian"
+    },
+    "BD008": {
+      "tma_min": 103.0,
+      "tma_max": 113.409,
+      "inflow_min": 0.0,
+      "inflow_max": 25.657,
+      "format": "15 Harian"
+    },
+    "BD009": {
+      "tma_min": 108.105,
+      "tma_max": 110.728,
+      "inflow_min": 0.0,
+      "inflow_max": 1.043,
+      "format": "15 Harian"
+    },
+    "BD010": {
+      "tma_min": 192.228,
+      "tma_max": 196.097,
+      "inflow_min": 0.005,
+      "inflow_max": 161.503,
+      "format": "15 Harian"
+    },
+    "BD011": {
+      "tma_min": 138.883,
+      "tma_max": 140.666,
+      "inflow_min": 0.006,
+      "inflow_max": 5.335,
+      "format": "15 Harian"
+    },
+    "BD012": {
+      "tma_min": 197.345,
+      "tma_max": 204.944,
+      "inflow_min": 0.0,
+      "inflow_max": 2.319,
+      "format": "15 Harian"
+    },
+    "BD013": {
+      "tma_min": 93.154,
+      "tma_max": 99.08,
+      "inflow_min": 0.0,
+      "inflow_max": 670.265,
+      "format": "15 Harian"
+    },
+    "BD014": {
+      "tma_min": 145.185,
+      "tma_max": 152.021,
+      "inflow_min": 0.0,
+      "inflow_max": 32.918,
+      "format": "15 Harian"
+    },
+    "BD015": {
+      "tma_min": 117.15,
+      "tma_max": 120.84,
+      "inflow_min": 0.0,
+      "inflow_max": 0.041,
+      "format": "15 Harian"
+    },
+    "BD016": {
+      "tma_min": 187.435,
+      "tma_max": 189.633,
+      "inflow_min": 0.0,
+      "inflow_max": 0.056,
+      "format": "15 Harian"
+    },
+    "BD017": {
+      "tma_min": 278.292,
+      "tma_max": 283.048,
+      "inflow_min": 0.051,
+      "inflow_max": 24.289,
+      "format": "15 Harian"
+    },
+    "BD018": {
+      "tma_min": 168.14,
+      "tma_max": 171.333,
+      "inflow_min": 0.029,
+      "inflow_max": 0.474,
+      "format": "15 Harian"
+    },
+    "BD019": {
+      "tma_min": 316.742,
+      "tma_max": 325.5,
+      "inflow_min": 0.0,
+      "inflow_max": 0.285,
+      "format": "15 Harian"
+    },
+    "BD020": {
+      "tma_min": 124.64,
+      "tma_max": 129.2,
+      "inflow_min": 0.0,
+      "inflow_max": 0.363,
+      "format": "15 Harian"
+    },
+    "BD021": {
+      "tma_min": 507.46,
+      "tma_max": 515.129,
+      "inflow_min": 0.744,
+      "inflow_max": 100.701,
+      "format": "15 Harian"
+    },
+    "BD022": {
+      "tma_min": 205.107,
+      "tma_max": 220.902,
+      "inflow_min": 0.0,
+      "inflow_max": 2272.443,
+      "format": "10 Harian"
+    },
+    "BD023": {
+      "tma_min": 799.883,
+      "tma_max": 810.079,
+      "inflow_min": 0.005,
+      "inflow_max": 20.909,
+      "format": "10 Harian"
+    },
+    "BD024": {
+      "tma_min": 1296.805,
+      "tma_max": 1300.64,
+      "inflow_min": 0.0,
+      "inflow_max": 79.406,
+      "format": "10 Harian"
+    },
+    "BD025": {
+      "tma_min": 188.019,
+      "tma_max": 192.43,
+      "inflow_min": 0.076,
+      "inflow_max": 78.396,
+      "format": "10 Harian"
+    },
+    "BD026": {
+      "tma_min": 76.82,
+      "tma_max": 84.268,
+      "inflow_min": 0.0,
+      "inflow_max": 2.17,
+      "format": "10 Harian"
+    },
+    "BD027": {
+      "tma_min": 107.72,
+      "tma_max": 110.08,
+      "inflow_min": 0.0,
+      "inflow_max": 4.367,
+      "format": "10 Harian"
+    },
+    "BD028": {
+      "tma_min": 90.328,
+      "tma_max": 93.289,
+      "inflow_min": 0.0,
+      "inflow_max": 6.066,
+      "format": "10 Harian"
+    },
+    "BD029": {
+      "tma_min": 113.997,
+      "tma_max": 118.039,
+      "inflow_min": 0.0,
+      "inflow_max": 0.469,
+      "format": "10 Harian"
+    },
+    "BD030": {
+      "tma_min": 144.83,
+      "tma_max": 149.039,
+      "inflow_min": 0.0,
+      "inflow_max": 0.668,
+      "format": "10 Harian"
+    },
+    "BD031": {
+      "tma_min": 98.6,
+      "tma_max": 106.556,
+      "inflow_min": 0.0,
+      "inflow_max": 4.924,
+      "format": "10 Harian"
+    },
+    "BD032": {
+      "tma_min": 122.375,
+      "tma_max": 127.804,
+      "inflow_min": 0.0,
+      "inflow_max": 2.996,
+      "format": "10 Harian"
+    },
+    "BD033": {
+      "tma_min": 31.003,
+      "tma_max": 38.216,
+      "inflow_min": 0.008,
+      "inflow_max": 9.899,
+      "format": "10 Harian"
+    },
+    "BD034": {
+      "tma_min": 87.52,
+      "tma_max": 93.34,
+      "inflow_min": 0.0,
+      "inflow_max": 23.734,
+      "format": "10 Harian"
+    },
+    "BD035": {
+      "tma_min": 108.946,
+      "tma_max": 115.286,
+      "inflow_min": 0.0,
+      "inflow_max": 21.019,
+      "format": "10 Harian"
+    },
+    "BD036": {
+      "tma_min": 43.111,
+      "tma_max": 49.049,
+      "inflow_min": 0.0,
+      "inflow_max": 2.499,
+      "format": "10 Harian"
+    },
+    "BD037": {
+      "tma_min": 84.007,
+      "tma_max": 87.702,
+      "inflow_min": 0.757,
+      "inflow_max": 10.416,
+      "format": "10 Harian"
+    },
+    "BD038": {
+      "tma_min": 114.807,
+      "tma_max": 120.146,
+      "inflow_min": 6.637,
+      "inflow_max": 69.512,
+      "format": "10 Harian"
+    },
+    "BD039": {
+      "tma_min": 43.015,
+      "tma_max": 43.337,
+      "inflow_min": 0.0,
+      "inflow_max": 10.591,
+      "format": "10 Harian"
+    },
+    "BD040": {
+      "tma_min": 164.252,
+      "tma_max": 165.124,
+      "inflow_min": 0.008,
+      "inflow_max": 1.179,
+      "format": "10 Harian"
+    },
+    "BD041": {
+      "tma_min": 232.194,
+      "tma_max": 239.184,
+      "inflow_min": 0.506,
+      "inflow_max": 15.362,
+      "format": "10 Harian"
+    },
+    "BD042": {
+      "tma_min": 75.019,
+      "tma_max": 75.977,
+      "inflow_min": 0.0,
+      "inflow_max": 0.0,
+      "format": "10 Harian"
+    },
+    "BD043": {
+      "tma_min": 171.678,
+      "tma_max": 175.56,
+      "inflow_min": 0.0,
+      "inflow_max": 0.017,
+      "format": "10 Harian"
+    },
+    "BD044": {
+      "tma_min": 84.42,
+      "tma_max": 90.306,
+      "inflow_min": 0.0,
+      "inflow_max": 5.323,
+      "format": "10 Harian"
+    },
+    "BD045": {
+      "tma_min": 56.47,
+      "tma_max": 61.027,
+      "inflow_min": 0.0,
+      "inflow_max": 0.208,
+      "format": "10 Harian"
+    },
+    "BD047": {
+      "tma_min": 97.766,
+      "tma_max": 105.542,
+      "inflow_min": 0.477,
+      "inflow_max": 47.017,
+      "format": "15 Harian"
+    },
+    "BD048": {
+      "tma_min": 30.3,
+      "tma_max": 33.053,
+      "inflow_min": 0.0,
+      "inflow_max": 0.856,
+      "format": "15 Harian"
+    },
+    "BD049": {
+      "tma_min": 40.606,
+      "tma_max": 44.816,
+      "inflow_min": 0.0,
+      "inflow_max": 0.912,
+      "format": "15 Harian"
+    },
+    "BD050": {
+      "tma_min": 245.192,
+      "tma_max": 259.237,
+      "inflow_min": 22.636,
+      "inflow_max": 262.361,
+      "format": "15 Harian"
+    },
+    "BD051": {
+      "tma_min": 22.5,
+      "tma_max": 32.312,
+      "inflow_min": 0.0,
+      "inflow_max": 2.352,
+      "format": "15 Harian"
+    },
+    "BD052": {
+      "tma_min": 201.35,
+      "tma_max": 205.422,
+      "inflow_min": 0.0,
+      "inflow_max": 1.728,
+      "format": "15 Harian"
+    },
+    "BD053": {
+      "tma_min": 707.092,
+      "tma_max": 712.652,
+      "inflow_min": 0.0,
+      "inflow_max": 64.304,
+      "format": "15 Harian"
+    },
+    "BD054": {
+      "tma_min": 98.229,
+      "tma_max": 118.102,
+      "inflow_min": 0.0,
+      "inflow_max": 6.254,
+      "format": "15 Harian"
+    },
+    "BD055": {
+      "tma_min": 49.103,
+      "tma_max": 55.783,
+      "inflow_min": 0.833,
+      "inflow_max": 26.47,
+      "format": "15 Harian"
+    },
+    "BD056": {
+      "tma_min": 77.172,
+      "tma_max": 80.267,
+      "inflow_min": 8.143,
+      "inflow_max": 704.362,
+      "format": "15 Harian"
+    },
+    "BD057": {
+      "tma_min": 217.427,
+      "tma_max": 266.54,
+      "inflow_min": 0.95,
+      "inflow_max": 103.763,
+      "format": "15 Harian"
+    },
+    "BD058": {
+      "tma_min": 116.735,
+      "tma_max": 124.318,
+      "inflow_min": 23.435,
+      "inflow_max": 82.408,
+      "format": "15 Harian"
+    },
+    "BD059": {
+      "tma_min": 27.351,
+      "tma_max": 37.001,
+      "inflow_min": 0.0,
+      "inflow_max": 506.623,
+      "format": "15 Harian"
+    },
+    "BD060": {
+      "tma_min": 47.565,
+      "tma_max": 54.298,
+      "inflow_min": 5.753,
+      "inflow_max": 66.385,
+      "format": "15 Harian"
+    },
+    "BD061": {
+      "tma_min": 28.018,
+      "tma_max": 29.183,
+      "inflow_min": 0.0,
+      "inflow_max": 0.395,
+      "format": "10 Harian"
+    },
+    "BD062": {
+      "tma_min": 52.652,
+      "tma_max": 63.61,
+      "inflow_min": 0.0,
+      "inflow_max": 0.369,
+      "format": "10 Harian"
+    },
+    "BD063": {
+      "tma_min": 37.8,
+      "tma_max": 40.904,
+      "inflow_min": 0.0,
+      "inflow_max": 0.239,
+      "format": "10 Harian"
+    },
+    "BD064": {
+      "tma_min": 102.98,
+      "tma_max": 108.859,
+      "inflow_min": 0.0,
+      "inflow_max": 4.866,
+      "format": "15 Harian"
+    },
+    "BD065": {
+      "tma_min": 43.029,
+      "tma_max": 51.1,
+      "inflow_min": 0.0,
+      "inflow_max": 0.641,
+      "format": "15 Harian"
+    },
+    "BD066": {
+      "tma_min": 65.61,
+      "tma_max": 67.139,
+      "inflow_min": 0.125,
+      "inflow_max": 6.37,
+      "format": "15 Harian"
+    },
+    "BD067": {
+      "tma_min": 381.32,
+      "tma_max": 394.032,
+      "inflow_min": 0.0,
+      "inflow_max": 0.121,
+      "format": "15 Harian"
+    },
+    "BD068": {
+      "tma_min": 116.7,
+      "tma_max": 123.587,
+      "inflow_min": 0.0,
+      "inflow_max": 0.577,
+      "format": "15 Harian"
+    },
+    "BD069": {
+      "tma_min": 54.298,
+      "tma_max": 59.599,
+      "inflow_min": 0.0,
+      "inflow_max": 0.534,
+      "format": "10 Harian"
+    },
+    "BD070": {
+      "tma_min": 118.887,
+      "tma_max": 120.17,
+      "inflow_min": 0.016,
+      "inflow_max": 7.667,
+      "format": "10 Harian"
+    },
+    "BD071": {
+      "tma_min": 29.01,
+      "tma_max": 35.567,
+      "inflow_min": 0.0,
+      "inflow_max": 1.151,
+      "format": "10 Harian"
+    },
+    "BD072": {
+      "tma_min": 55.48,
+      "tma_max": 64.361,
+      "inflow_min": 0.0,
+      "inflow_max": 0.542,
+      "format": "10 Harian"
+    },
+    "BD073": {
+      "tma_min": 87.622,
+      "tma_max": 95.12,
+      "inflow_min": 0.0,
+      "inflow_max": 0.955,
+      "format": "10 Harian"
+    },
+    "BD074": {
+      "tma_min": 60.188,
+      "tma_max": 64.511,
+      "inflow_min": 0.0,
+      "inflow_max": 0.116,
+      "format": "10 Harian"
+    },
+    "BD075": {
+      "tma_min": 92.0,
+      "tma_max": 105.698,
+      "inflow_min": 0.0,
+      "inflow_max": 0.288,
+      "format": "10 Harian"
+    },
+    "BD076": {
+      "tma_min": 292.466,
+      "tma_max": 293.017,
+      "inflow_min": 0.0,
+      "inflow_max": 0.164,
+      "format": "10 Harian"
+    },
+    "BD077": {
+      "tma_min": 139.55,
+      "tma_max": 150.164,
+      "inflow_min": 0.131,
+      "inflow_max": 7.602,
+      "format": "10 Harian"
+    },
+    "BD078": {
+      "tma_min": 39.319,
+      "tma_max": 48.029,
+      "inflow_min": 0.0,
+      "inflow_max": 3.589,
+      "format": "15 Harian"
+    },
+    "BD079": {
+      "tma_min": 91.236,
+      "tma_max": 106.147,
+      "inflow_min": 0.0,
+      "inflow_max": 12.458,
+      "format": "10 Harian"
+    },
+    "BD080": {
+      "tma_min": 88.6,
+      "tma_max": 92.802,
+      "inflow_min": 0.0,
+      "inflow_max": 0.07,
+      "format": "10 Harian"
+    },
+    "BD081": {
+      "tma_min": 130.0,
+      "tma_max": 139.789,
+      "inflow_min": 0.0,
+      "inflow_max": 0.626,
+      "format": "10 Harian"
+    },
+    "BD082": {
+      "tma_min": 114.65,
+      "tma_max": 126.409,
+      "inflow_min": 0.0,
+      "inflow_max": 0.629,
+      "format": "10 Harian"
+    },
+    "BD083": {
+      "tma_min": 165.95,
+      "tma_max": 173.169,
+      "inflow_min": 0.0,
+      "inflow_max": 1.106,
+      "format": "10 Harian"
+    },
+    "BD084": {
+      "tma_min": 88.4,
+      "tma_max": 90.745,
+      "inflow_min": 0.0,
+      "inflow_max": 6.046,
+      "format": "10 Harian"
+    },
+    "BD085": {
+      "tma_min": 388.422,
+      "tma_max": 392.118,
+      "inflow_min": 0.0,
+      "inflow_max": 0.433,
+      "format": "10 Harian"
+    },
+    "BD086": {
+      "tma_min": 24.395,
+      "tma_max": 27.788,
+      "inflow_min": 0.0,
+      "inflow_max": 0.461,
+      "format": "10 Harian"
+    },
+    "BD087": {
+      "tma_min": 17.02,
+      "tma_max": 23.759,
+      "inflow_min": 0.0,
+      "inflow_max": 0.202,
+      "format": "10 Harian"
+    },
+    "BD088": {
+      "tma_min": 99.65,
+      "tma_max": 105.379,
+      "inflow_min": 0.0,
+      "inflow_max": 0.221,
+      "format": "10 Harian"
+    },
+    "BD089": {
+      "tma_min": 17.895,
+      "tma_max": 26.859,
+      "inflow_min": 0.0,
+      "inflow_max": 3.235,
+      "format": "10 Harian"
+    },
+    "BD090": {
+      "tma_min": 27.1,
+      "tma_max": 37.179,
+      "inflow_min": 0.0,
+      "inflow_max": 1.564,
+      "format": "10 Harian"
+    },
+    "BD091": {
+      "tma_min": 570.54,
+      "tma_max": 571.705,
+      "inflow_min": 0.0,
+      "inflow_max": 0.027,
+      "format": "10 Harian"
+    },
+    "BD092": {
+      "tma_min": 523.877,
+      "tma_max": 525.593,
+      "inflow_min": 0.0,
+      "inflow_max": 0.03,
+      "format": "10 Harian"
+    },
+    "BD093": {
+      "tma_min": 54.733,
+      "tma_max": 55.687,
+      "inflow_min": 0.0,
+      "inflow_max": 0.016,
+      "format": "10 Harian"
+    },
+    "BD094": {
+      "tma_min": 84.13,
+      "tma_max": 86.395,
+      "inflow_min": 0.0,
+      "inflow_max": 0.059,
+      "format": "10 Harian"
+    },
+    "BD095": {
+      "tma_min": 90.75,
+      "tma_max": 92.536,
+      "inflow_min": 0.009,
+      "inflow_max": 130.796,
+      "format": "10 Harian"
+    },
+    "BD096": {
+      "tma_min": 156.55,
+      "tma_max": 169.392,
+      "inflow_min": 0.0,
+      "inflow_max": 0.166,
+      "format": "10 Harian"
+    },
+    "BD097": {
+      "tma_min": 144.12,
+      "tma_max": 145.044,
+      "inflow_min": 0.0,
+      "inflow_max": 0.006,
+      "format": "10 Harian"
+    },
+    "BD098": {
+      "tma_min": 135.13,
+      "tma_max": 139.677,
+      "inflow_min": 0.0,
+      "inflow_max": 0.198,
+      "format": "10 Harian"
+    },
+    "BD099": {
+      "tma_min": 79.12,
+      "tma_max": 87.884,
+      "inflow_min": 0.0,
+      "inflow_max": 0.089,
+      "format": "10 Harian"
+    },
+    "BD100": {
+      "tma_min": 113.956,
+      "tma_max": 121.032,
+      "inflow_min": 0.0,
+      "inflow_max": 0.074,
+      "format": "10 Harian"
+    },
+    "BD101": {
+      "tma_min": 52.41,
+      "tma_max": 57.206,
+      "inflow_min": 0.0,
+      "inflow_max": 21.058,
+      "format": "10 Harian"
+    },
+    "BD102": {
+      "tma_min": 125.3,
+      "tma_max": 128.678,
+      "inflow_min": 0.0,
+      "inflow_max": 0.183,
+      "format": "10 Harian"
+    },
+    "BD103": {
+      "tma_min": 384.657,
+      "tma_max": 384.789,
+      "inflow_min": 0.0,
+      "inflow_max": 0.15,
+      "format": "10 Harian"
+    },
+    "BD104": {
+      "tma_min": 37.0,
+      "tma_max": 45.025,
+      "inflow_min": 0.0,
+      "inflow_max": 5.599,
+      "format": "10 Harian"
+    },
+    "BD105": {
+      "tma_min": 158.669,
+      "tma_max": 159.649,
+      "inflow_min": 0.0,
+      "inflow_max": 4.623,
+      "format": "10 Harian"
+    },
+    "BD106": {
+      "tma_min": 88.565,
+      "tma_max": 98.978,
+      "inflow_min": 0.0,
+      "inflow_max": 1.874,
+      "format": "10 Harian"
+    },
+    "BD107": {
+      "tma_min": 274.225,
+      "tma_max": 281.523,
+      "inflow_min": 0.021,
+      "inflow_max": 16.11,
+      "format": "10 Harian"
+    },
+    "BD108": {
+      "tma_min": 54.8,
+      "tma_max": 61.713,
+      "inflow_min": 0.0,
+      "inflow_max": 5.257,
+      "format": "10 Harian"
+    },
+    "BD109": {
+      "tma_min": 187.0,
+      "tma_max": 195.265,
+      "inflow_min": 0.0,
+      "inflow_max": 0.364,
+      "format": "10 Harian"
+    },
+    "BD110": {
+      "tma_min": 71.69,
+      "tma_max": 82.364,
+      "inflow_min": 0.0,
+      "inflow_max": 3.561,
+      "format": "10 Harian"
+    },
+    "BD111": {
+      "tma_min": 72.985,
+      "tma_max": 75.649,
+      "inflow_min": 0.0,
+      "inflow_max": 4.939,
+      "format": "10 Harian"
+    },
+    "BD112": {
+      "tma_min": 103.377,
+      "tma_max": 115.469,
+      "inflow_min": 2.189,
+      "inflow_max": 65.821,
+      "format": "10 Harian"
+    },
+    "BD113": {
+      "tma_min": 63.047,
+      "tma_max": 64.02,
+      "inflow_min": 0.0,
+      "inflow_max": 0.012,
+      "format": "10 Harian"
+    },
+    "BD114": {
+      "tma_min": 71.85,
+      "tma_max": 93.446,
+      "inflow_min": 0.0,
+      "inflow_max": 41.273,
+      "format": "10 Harian"
+    },
+    "BD115": {
+      "tma_min": 108.119,
+      "tma_max": 116.178,
+      "inflow_min": 0.032,
+      "inflow_max": 15.392,
+      "format": "10 Harian"
+    },
+    "BD116": {
+      "tma_min": 21.0,
+      "tma_max": 27.046,
+      "inflow_min": 0.0,
+      "inflow_max": 0.402,
+      "format": "10 Harian"
+    },
+    "BD117": {
+      "tma_min": 88.12,
+      "tma_max": 94.616,
+      "inflow_min": 0.0,
+      "inflow_max": 0.688,
+      "format": "10 Harian"
+    },
+    "BD118": {
+      "tma_min": 73.178,
+      "tma_max": 93.631,
+      "inflow_min": 0.0,
+      "inflow_max": 49.293,
+      "format": "10 Harian"
+    },
+    "BD119": {
+      "tma_min": 48.05,
+      "tma_max": 56.196,
+      "inflow_min": 0.0,
+      "inflow_max": 129.942,
+      "format": "10 Harian"
+    },
+    "BD120": {
+      "tma_min": 27.2,
+      "tma_max": 33.086,
+      "inflow_min": 0.0,
+      "inflow_max": 2.585,
+      "format": "10 Harian"
+    },
+    "BD121": {
+      "tma_min": 69.26,
+      "tma_max": 77.704,
+      "inflow_min": 0.0,
+      "inflow_max": 1.217,
+      "format": "10 Harian"
+    },
+    "BD122": {
+      "tma_min": 26.5,
+      "tma_max": 30.635,
+      "inflow_min": 0.0,
+      "inflow_max": 4.529,
+      "format": "10 Harian"
+    },
+    "BD123": {
+      "tma_min": 118.237,
+      "tma_max": 123.131,
+      "inflow_min": 0.0,
+      "inflow_max": 0.228,
+      "format": "10 Harian"
+    },
+    "BD124": {
+      "tma_min": 51.03,
+      "tma_max": 60.321,
+      "inflow_min": 0.035,
+      "inflow_max": 27.818,
+      "format": "10 Harian"
+    },
+    "BD125": {
+      "tma_min": 33.47,
+      "tma_max": 48.012,
+      "inflow_min": 0.0,
+      "inflow_max": 0.384,
+      "format": "10 Harian"
+    },
+    "BD126": {
+      "tma_min": 25.3,
+      "tma_max": 33.476,
+      "inflow_min": 0.0,
+      "inflow_max": 46.563,
+      "format": "10 Harian"
+    },
+    "BD127": {
+      "tma_min": 149.68,
+      "tma_max": 158.311,
+      "inflow_min": 0.0,
+      "inflow_max": 0.265,
+      "format": "10 Harian"
+    },
+    "BD128": {
+      "tma_min": 23.0,
+      "tma_max": 27.86,
+      "inflow_min": 0.0,
+      "inflow_max": 17.291,
+      "format": "10 Harian"
+    },
+    "BD129": {
+      "tma_min": 108.23,
+      "tma_max": 116.068,
+      "inflow_min": 0.0,
+      "inflow_max": 0.544,
+      "format": "10 Harian"
+    },
+    "BD130": {
+      "tma_min": 59.0,
+      "tma_max": 68.024,
+      "inflow_min": 0.0,
+      "inflow_max": 5.626,
+      "format": "10 Harian"
+    },
+    "BD131": {
+      "tma_min": 65.5,
+      "tma_max": 73.718,
+      "inflow_min": 0.0,
+      "inflow_max": 0.239,
+      "format": "10 Harian"
+    },
+    "BD132": {
+      "tma_min": 15.0,
+      "tma_max": 22.572,
+      "inflow_min": 0.0,
+      "inflow_max": 19.582,
+      "format": "10 Harian"
+    },
+    "BD133": {
+      "tma_min": 43.457,
+      "tma_max": 57.182,
+      "inflow_min": 0.0,
+      "inflow_max": 102.781,
+      "format": "10 Harian"
+    },
+    "BD134": {
+      "tma_min": 215.658,
+      "tma_max": 218.187,
+      "inflow_min": 0.079,
+      "inflow_max": 16.301,
+      "format": "15 Harian"
+    },
+    "BD135": {
+      "tma_min": 74.944,
+      "tma_max": 75.7,
+      "inflow_min": 0.002,
+      "inflow_max": 0.177,
+      "format": "15 Harian"
+    },
+    "BD136": {
+      "tma_min": 67.84,
+      "tma_max": 70.52,
+      "inflow_min": 0.0,
+      "inflow_max": 1.063,
+      "format": "15 Harian"
+    },
+    "BD137": {
+      "tma_min": 124.0,
+      "tma_max": 130.038,
+      "inflow_min": 0.0,
+      "inflow_max": 0.331,
+      "format": "15 Harian"
+    },
+    "BD138": {
+      "tma_min": 95.222,
+      "tma_max": 98.532,
+      "inflow_min": 0.0,
+      "inflow_max": 0.436,
+      "format": "15 Harian"
+    },
+    "BD139": {
+      "tma_min": 25.253,
+      "tma_max": 27.0,
+      "inflow_min": 0.0,
+      "inflow_max": 0.385,
+      "format": "15 Harian"
+    },
+    "BD140": {
+      "tma_min": 44.601,
+      "tma_max": 47.314,
+      "inflow_min": 0.001,
+      "inflow_max": 1.035,
+      "format": "15 Harian"
+    },
+    "BD141": {
+      "tma_min": 448.597,
+      "tma_max": 452.439,
+      "inflow_min": 0.0,
+      "inflow_max": 7.104,
+      "format": "15 Harian"
+    },
+    "BD142": {
+      "tma_min": 97.528,
+      "tma_max": 104.102,
+      "inflow_min": 0.0,
+      "inflow_max": 1063.832,
+      "format": "15 Harian"
+    },
+    "BD143": {
+      "tma_min": 92.719,
+      "tma_max": 100.151,
+      "inflow_min": 0.0,
+      "inflow_max": 558.288,
+      "format": "15 Harian"
+    },
+    "BD144": {
+      "tma_min": 362.464,
+      "tma_max": 375.315,
+      "inflow_min": 0.0,
+      "inflow_max": 21.512,
+      "format": "15 Harian"
+    },
+    "BD145": {
+      "tma_min": 571.982,
+      "tma_max": 576.01,
+      "inflow_min": 0.0,
+      "inflow_max": 0.109,
+      "format": "15 Harian"
+    },
+    "BD146": {
+      "tma_min": 365.481,
+      "tma_max": 368.918,
+      "inflow_min": 0.01,
+      "inflow_max": 4.539,
+      "format": "15 Harian"
+    },
+    "BD147": {
+      "tma_min": 332.733,
+      "tma_max": 339.144,
+      "inflow_min": 0.04,
+      "inflow_max": 1.351,
+      "format": "15 Harian"
+    },
+    "BD148": {
+      "tma_min": 806.74,
+      "tma_max": 810.396,
+      "inflow_min": 0.0,
+      "inflow_max": 7.662,
+      "format": "15 Harian"
+    },
+    "BD149": {
+      "tma_min": 65.509,
+      "tma_max": 73.494,
+      "inflow_min": 0.0,
+      "inflow_max": 1.143,
+      "format": "15 Harian"
+    },
+    "BD150": {
+      "tma_min": 70.821,
+      "tma_max": 77.655,
+      "inflow_min": 0.0,
+      "inflow_max": 30.64,
+      "format": "15 Harian"
+    },
+    "BD151": {
+      "tma_min": 334.188,
+      "tma_max": 339.555,
+      "inflow_min": 0.0,
+      "inflow_max": 2.7,
+      "format": "15 Harian"
+    },
+    "BD152": {
+      "tma_min": 61.52,
+      "tma_max": 63.733,
+      "inflow_min": 0.0,
+      "inflow_max": 0.158,
+      "format": "15 Harian"
+    },
+    "BD153": {
+      "tma_min": 71.996,
+      "tma_max": 89.822,
+      "inflow_min": 0.0,
+      "inflow_max": 106.224,
+      "format": "15 Harian"
+    },
+    "BD154": {
+      "tma_min": 74.479,
+      "tma_max": 78.275,
+      "inflow_min": 0.0,
+      "inflow_max": 0.399,
+      "format": "15 Harian"
+    },
+    "BD155": {
+      "tma_min": 45.395,
+      "tma_max": 47.014,
+      "inflow_min": 0.0,
+      "inflow_max": 0.234,
+      "format": "15 Harian"
+    },
+    "BD156": {
+      "tma_min": 80.259,
+      "tma_max": 81.554,
+      "inflow_min": 0.0,
+      "inflow_max": 0.684,
+      "format": "15 Harian"
+    },
+    "BD157": {
+      "tma_min": 46.6,
+      "tma_max": 51.619,
+      "inflow_min": 0.0,
+      "inflow_max": 1.464,
+      "format": "15 Harian"
+    },
+    "BD158": {
+      "tma_min": 194.92,
+      "tma_max": 207.09,
+      "inflow_min": 0.0,
+      "inflow_max": 86.642,
+      "format": "15 Harian"
+    },
+    "BD159": {
+      "tma_min": 116.57,
+      "tma_max": 120.118,
+      "inflow_min": 0.0,
+      "inflow_max": 134.539,
+      "format": "15 Harian"
+    },
+    "BD160": {
+      "tma_min": 308.33,
+      "tma_max": 320.101,
+      "inflow_min": 0.0,
+      "inflow_max": 1.255,
+      "format": "15 Harian"
+    },
+    "BD161": {
+      "tma_min": 41.46,
+      "tma_max": 45.934,
+      "inflow_min": 0.002,
+      "inflow_max": 1.814,
+      "format": "15 Harian"
+    },
+    "BD162": {
+      "tma_min": 78.046,
+      "tma_max": 88.796,
+      "inflow_min": 0.176,
+      "inflow_max": 18.318,
+      "format": "15 Harian"
+    },
+    "BD163": {
+      "tma_min": 67.8,
+      "tma_max": 70.046,
+      "inflow_min": 0.073,
+      "inflow_max": 3.897,
+      "format": "15 Harian"
+    },
+    "BD164": {
+      "tma_min": 91.91,
+      "tma_max": 94.427,
+      "inflow_min": 0.0,
+      "inflow_max": 3.187,
+      "format": "15 Harian"
+    },
+    "BD165": {
+      "tma_min": 113.006,
+      "tma_max": 120.517,
+      "inflow_min": 0.0,
+      "inflow_max": 0.458,
+      "format": "15 Harian"
+    },
+    "BD166": {
+      "tma_min": 237.049,
+      "tma_max": 239.448,
+      "inflow_min": 0.007,
+      "inflow_max": 79.947,
+      "format": "15 Harian"
+    },
+    "BD167": {
+      "tma_min": 82.612,
+      "tma_max": 99.543,
+      "inflow_min": 25.268,
+      "inflow_max": 397.242,
+      "format": "15 Harian"
+    },
+    "BD168": {
+      "tma_min": 34.826,
+      "tma_max": 39.578,
+      "inflow_min": 0.0,
+      "inflow_max": 40.305,
+      "format": "15 Harian"
+    },
+    "BD169": {
+      "tma_min": 41.133,
+      "tma_max": 50.188,
+      "inflow_min": 0.0,
+      "inflow_max": 62.361,
+      "format": "10 Harian"
+    },
+    "BD170": {
+      "tma_min": 62.73,
+      "tma_max": 76.068,
+      "inflow_min": 0.014,
+      "inflow_max": 3.702,
+      "format": "15 Harian"
+    },
+    "BD171": {
+      "tma_min": 207.916,
+      "tma_max": 213.948,
+      "inflow_min": 0.0,
+      "inflow_max": 5.692,
+      "format": "15 Harian"
+    },
+    "BD172": {
+      "tma_min": 230.368,
+      "tma_max": 248.637,
+      "inflow_min": 1.671,
+      "inflow_max": 84.457,
+      "format": "15 Harian"
+    },
+    "BD173": {
+      "tma_min": 112.45,
+      "tma_max": 126.307,
+      "inflow_min": 0.0,
+      "inflow_max": 56.386,
+      "format": "15 Harian"
+    },
+    "BD174": {
+      "tma_min": 60.196,
+      "tma_max": 72.04,
+      "inflow_min": 0.01,
+      "inflow_max": 11.929,
+      "format": "15 Harian"
+    },
+    "BD175": {
+      "tma_min": 160.03,
+      "tma_max": 182.761,
+      "inflow_min": 0.331,
+      "inflow_max": 66.324,
+      "format": "15 Harian"
+    },
+    "BD176": {
+      "tma_min": 129.277,
+      "tma_max": 136.747,
+      "inflow_min": 0.36,
+      "inflow_max": 18.899,
+      "format": "15 Harian"
+    },
+    "BD177": {
+      "tma_min": 190.867,
+      "tma_max": 192.0,
+      "inflow_min": 0.0,
+      "inflow_max": 0.0,
+      "format": "15 Harian"
+    },
+    "BD178": {
+      "tma_min": 117.287,
+      "tma_max": 126.138,
+      "inflow_min": 0.0,
+      "inflow_max": 2.346,
+      "format": "15 Harian"
+    },
+    "BD179": {
+      "tma_min": 161.241,
+      "tma_max": 170.468,
+      "inflow_min": 0.0,
+      "inflow_max": 1.181,
+      "format": "15 Harian"
+    },
+    "BD180": {
+      "tma_min": 145.559,
+      "tma_max": 155.762,
+      "inflow_min": 3.907,
+      "inflow_max": 13.818,
+      "format": "15 Harian"
+    },
+    "BD181": {
+      "tma_min": 162.764,
+      "tma_max": 171.819,
+      "inflow_min": 0.0,
+      "inflow_max": 30.434,
+      "format": "15 Harian"
+    },
+    "BD182": {
+      "tma_min": 68.8,
+      "tma_max": 77.067,
+      "inflow_min": 0.0,
+      "inflow_max": 6.21,
+      "format": "15 Harian"
+    },
+    "BD183": {
+      "tma_min": 197.414,
+      "tma_max": 199.23,
+      "inflow_min": 0.58,
+      "inflow_max": 24.338,
+      "format": "15 Harian"
+    },
+    "BD184": {
+      "tma_min": 140.166,
+      "tma_max": 145.594,
+      "inflow_min": 0.034,
+      "inflow_max": 20.807,
+      "format": "10 Harian"
+    },
+    "BD185": {
+      "tma_min": 10.889,
+      "tma_max": 11.51,
+      "inflow_min": 0.105,
+      "inflow_max": 2.256,
+      "format": "15 Harian"
+    },
+    "BD186": {
+      "tma_min": 7.291,
+      "tma_max": 7.653,
+      "inflow_min": 2.301,
+      "inflow_max": 21.767,
+      "format": "15 Harian"
+    },
+    "BD187": {
+      "tma_min": 15.741,
+      "tma_max": 15.923,
+      "inflow_min": 0.0,
+      "inflow_max": 0.078,
+      "format": "15 Harian"
+    },
+    "BD188": {
+      "tma_min": 10.249,
+      "tma_max": 11.11,
+      "inflow_min": 0.0,
+      "inflow_max": 2.788,
+      "format": "15 Harian"
+    },
+    "BD189": {
+      "tma_min": 104.943,
+      "tma_max": 114.255,
+      "inflow_min": 0.0,
+      "inflow_max": 38.837,
+      "format": "15 Harian"
+    },
+    "BD190": {
+      "tma_min": 109.137,
+      "tma_max": 119.939,
+      "inflow_min": 0.0,
+      "inflow_max": 3.898,
+      "format": "15 Harian"
+    },
+    "BD191": {
+      "tma_min": 118.145,
+      "tma_max": 122.357,
+      "inflow_min": 1.662,
+      "inflow_max": 37.844,
+      "format": "15 Harian"
+    },
+    "BD192": {
+      "tma_min": 42.828,
+      "tma_max": 45.848,
+      "inflow_min": 0.0,
+      "inflow_max": 3.298,
+      "format": "15 Harian"
+    },
+    "BD193": {
+      "tma_min": 66.0,
+      "tma_max": 72.261,
+      "inflow_min": 0.0,
+      "inflow_max": 0.912,
+      "format": "15 Harian"
+    },
+    "BD194": {
+      "tma_min": 38.24,
+      "tma_max": 57.619,
+      "inflow_min": 0.0,
+      "inflow_max": 1.363,
+      "format": "15 Harian"
+    },
+    "BD195": {
+      "tma_min": 505.505,
+      "tma_max": 517.336,
+      "inflow_min": 3.403,
+      "inflow_max": 157.594,
+      "format": "15 Harian"
+    },
+    "BD196": {
+      "tma_min": 96.65,
+      "tma_max": 97.51,
+      "inflow_min": 0.0,
+      "inflow_max": 0.45,
+      "format": "10 Harian"
+    },
+    "BD197": {
+      "tma_min": 565.586,
+      "tma_max": 569.507,
+      "inflow_min": 0.251,
+      "inflow_max": 13.63,
+      "format": "15 Harian"
+    },
+    "BD198": {
+      "tma_min": 91.742,
+      "tma_max": 93.579,
+      "inflow_min": 0.023,
+      "inflow_max": 0.209,
+      "format": "10 Harian"
+    },
+    "BD199": {
+      "tma_min": 107.0,
+      "tma_max": 107.0,
+      "inflow_min": 0.0,
+      "inflow_max": 0.0,
+      "format": "15 Harian"
+    },
+    "BD201": {
+      "tma_min": 358.389,
+      "tma_max": 361.002,
+      "inflow_min": 0.0,
+      "inflow_max": 0.013,
+      "format": "15 Harian"
+    },
+    "BD202": {
+      "tma_min": 36.4,
+      "tma_max": 39.038,
+      "inflow_min": 0.0,
+      "inflow_max": 1.706,
+      "format": "15 Harian"
+    },
+    "BD203": {
+      "tma_min": 141.504,
+      "tma_max": 149.774,
+      "inflow_min": 0.957,
+      "inflow_max": 15.383,
+      "format": "15 Harian"
+    },
+    "BD204": {
+      "tma_min": 9.677,
+      "tma_max": 10.44,
+      "inflow_min": 0.587,
+      "inflow_max": 13.785,
+      "format": "15 Harian"
+    },
+    "BD205": {
+      "tma_min": 14.197,
+      "tma_max": 15.231,
+      "inflow_min": 0.371,
+      "inflow_max": 21.0,
+      "format": "15 Harian"
+    },
+    "BD206": {
+      "tma_min": 21.036,
+      "tma_max": 21.588,
+      "inflow_min": 0.055,
+      "inflow_max": 2.041,
+      "format": "15 Harian"
+    },
+    "BD207": {
+      "tma_min": 22.694,
+      "tma_max": 24.015,
+      "inflow_min": 0.031,
+      "inflow_max": 0.427,
+      "format": "15 Harian"
+    },
+    "BD208": {
+      "tma_min": 89.482,
+      "tma_max": 97.461,
+      "inflow_min": 14.83,
+      "inflow_max": 51.082,
+      "format": "15 Harian"
+    },
+    "BD209": {
+      "tma_min": 88.45,
+      "tma_max": 88.979,
+      "inflow_min": 0.009,
+      "inflow_max": 0.323,
+      "format": "15 Harian"
+    },
+    "BD210": {
+      "tma_min": 14.536,
+      "tma_max": 14.883,
+      "inflow_min": 0.064,
+      "inflow_max": 0.144,
+      "format": "15 Harian"
+    },
+    "BD211": {
+      "tma_min": 8.802,
+      "tma_max": 9.125,
+      "inflow_min": 0.0,
+      "inflow_max": 4.805,
+      "format": "15 Harian"
+    },
+    "BD212": {
+      "tma_min": 16.121,
+      "tma_max": 19.709,
+      "inflow_min": 0.0,
+      "inflow_max": 3.512,
+      "format": "15 Harian"
+    }
+  },
+  "fitur": [
+    "tma_norm",
+    "inflow_norm",
+    "sin_pos",
+    "cos_pos",
+    "skor_musim"
+  ],
+  "output_periode": {
+    "15 Harian": 10,
+    "10 Harian": 15
+  },
+  "val_mae": {
+    "15 Harian": 0.058533456176519394,
+    "10 Harian": 0.0690106600522995
+  }
+}
