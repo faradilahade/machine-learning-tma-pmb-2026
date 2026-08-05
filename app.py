@@ -6,7 +6,7 @@ Prasyarat: pipeline sudah dijalankan (python run_pipeline.py) sehingga
 
 Menu:
   🏜️ Siaga Kekeringan        - ringkasan visual nasional + akurasi & metode
-  📈 Detail Bendungan        - grafik sandingan + neraca air + unduh per bendungan
+  📈 Detail Bendungan        - grafik sandingan + kecukupan air + unduh per bendungan
   🚨 Pemantauan Agustus 2026 - tabel pemantauan bulan fokus untuk semua bendungan
   🗂️ Rekap & Di bawah BON B  - rekap nasional, per balai, daftar kritis
   🧩 Data Belum Cocok        - bendungan yang datanya belum terhubung antar sumber
@@ -15,31 +15,39 @@ Menu:
 import io
 import os
 import sys
+import time
 import datetime as dt
+import numpy as np
 import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from src.utils import (load_config, path_root, baca_daftar_bendungan,
-                       baca_neraca_air, baca_sifat_musim)
+                       baca_neraca_air, baca_sifat_musim, daftar_periode)
 import src.laporan as lap
+import src.kecukupan as kc
 from src.laporan import KRITIS, WASPADA, NORMAL, TANPA_BON, BULAN_ID, WARNA
 from src.evaluasi import METODE_INFO, METODE_LSTM, ringkas as ringkas_evaluasi
 
-st.set_page_config(page_title="Prediksi TMA 2026 — PMB", page_icon="🌊",
+st.set_page_config(page_title="DDEWOMS — PMB", page_icon="🌊",
                    layout="wide")
 
 # latar pastel untuk sel tabel
 WARNA_STATUS = {KRITIS: "#F8CBCB", WASPADA: "#FFEB9C",
                 NORMAL: "#C6EFCE", TANPA_BON: "#E4E4E4",
                 "Defisit": "#F8CBCB", "Surplus": "#C6EFCE",
+                "Cukup": "#C6EFCE", "Belum cukup": "#F8CBCB",
                 "Tanpa Data": "#E4E4E4"}
 # isi tegas untuk mark grafik (selalu berpasangan dengan label + angka)
 WARNA_GRAFIK = {KRITIS: "#C62828", WASPADA: "#D98E04",
                 NORMAL: "#2E7D32", TANPA_BON: "#9E9E9E",
-                "Defisit": "#C62828", "Surplus": "#2A9D8F"}
+                "Defisit": "#C62828", "Surplus": "#2A9D8F",
+                "Cukup": "#2E7D32", "Belum cukup": "#C62828"}
 URUT_STATUS = [KRITIS, WASPADA, NORMAL, TANPA_BON]
+# badge rekomendasi operasional
+WARNA_BADGE = {"hijau": "#C6EFCE", "amber": "#FFEB9C",
+               "merah": "#F8CBCB", "abu": "#E4E4E4"}
 
 
 # ------------------------------------------------------------------ data
@@ -65,7 +73,17 @@ def muat_data():
     sifat_musim = baca_sifat_musim(cfg, daftar)
     fp_ev = path_root(cfg["output"]["dir_prediksi"], "evaluasi_metode.parquet")
     evaluasi = pd.read_parquet(fp_ev) if os.path.exists(fp_ev) else pd.DataFrame()
-    return df, hist, daftar, rekap_qc, neraca, evaluasi, sifat_musim
+    # sumber baru: workbook RTOW periodik + elevasi kekeringan + storage curve
+    kunci = daftar[["id_db", "kode_bendungan"]].drop_duplicates()
+    rtow_p = kc.baca_rtow_periodik()
+    if not rtow_p.empty:
+        rtow_p = rtow_p.merge(kunci, on="id_db", how="inner")
+    kek = kc.baca_elevasi_kekeringan()
+    if not kek.empty:
+        kek = kek.merge(kunci, on="id_db", how="inner")
+    kurva_sc = kc.baca_storage_curve()
+    return (df, hist, daftar, rekap_qc, neraca, evaluasi, sifat_musim,
+            rtow_p, kek, kurva_sc)
 
 
 @st.cache_data(show_spinner="Menyusun berkas Excel…")
@@ -107,14 +125,16 @@ def warnai_status(d: pd.DataFrame, kolom: str):
     return d.style.apply(gaya, axis=1)
 
 
-df, hist, daftar, rekap_qc, neraca, evaluasi, sifat_musim = muat_data()
+(df, hist, daftar, rekap_qc, neraca, evaluasi, sifat_musim,
+ rtow_p, kek, kurva_sc) = muat_data()
 
 # ------------------------------------------------------------------ header
 st.markdown(
-    f"<h2 style='color:{WARNA['navy']};margin-bottom:0'>🌊 Prediksi TMA Musim Kering 2026</h2>"
+    f"<h2 style='color:{WARNA['navy']};margin-bottom:0'>🌊 Dams Drought Early "
+    f"Warning and Operational Mitigation System (DDEWOMS)</h2>"
     f"<p style='color:{WARNA['biru']};margin-top:2px'>Pusat Monitoring Bendungan — LSTM per periode "
     f"10/15-harian (format RTOW) + sifat musim · prediksi Agustus–Desember 2026 · "
-    f"sandingan BON A / BON B / RTOW</p>",
+    f"sandingan Bon A / Bon B / RTOW · kecukupan air RTOW periodik</p>",
     unsafe_allow_html=True)
 
 # ------------------------------------------------------------------ sidebar
@@ -161,6 +181,387 @@ if n_bdg == 0:
 pred_dff = dff[dff["jenis"] == "prediksi"]
 kode_kritis = sorted(pred_dff[pred_dff["status_bon"] == KRITIS]["kode_bendungan"].unique())
 neraca_dff = neraca[neraca["kode_bendungan"].isin(dff["kode_bendungan"].unique())]
+
+
+# ================================================================== RTOW periodik
+# Helper sumber data baru (workbook per periode + storage curve). Nilai kosong
+# DIBIARKAN kosong — grafik/metrik menampilkan placeholder, tanpa interpolasi.
+KOLOM_PERIODIK = ("bon_a", "bon_b", "rtow", "ketersediaan_m3s", "kebutuhan_m3s")
+
+
+def ambil_periodik(kode: str, fmt: str):
+    """Data RTOW periodik 1 bendungan.
+
+    Return (pb, kek_b, kurva_b): pb = DataFrame berindeks label periode penuh
+    setahun (kolom KOLOM_PERIODIK, NaN bila belum tersedia); kek_b = baris
+    elevasi kekeringan/dasar waduk (None bila tidak ada); kurva_b = storage
+    curve bendungan (DataFrame kosong bila tidak ada).
+    """
+    urut = daftar_periode(fmt, 1, 12)
+    b = (rtow_p[rtow_p["kode_bendungan"] == kode]
+         if not rtow_p.empty else pd.DataFrame())
+    pb = (b.drop_duplicates("periode").set_index("periode").reindex(urut)
+          if not b.empty else pd.DataFrame(index=urut))
+    for c in KOLOM_PERIODIK:
+        if c not in pb.columns:
+            pb[c] = np.nan
+    kek_b = None
+    if not kek.empty:
+        kb = kek[kek["kode_bendungan"] == kode]
+        if not kb.empty:
+            kek_b = kb.iloc[0]
+    kurva_b = kc.kurva_bendungan(kurva_sc, kode)
+    return pb, kek_b, kurva_b
+
+
+def badge_html(teks: str, latar: str) -> str:
+    return (f"<span style='background:{latar};color:#1A1A2E;padding:2px 12px;"
+            f"border-radius:12px;font-weight:600;font-size:0.92em;"
+            f"white-space:nowrap'>{teks}</span>")
+
+
+def fig_sandingan(g: pd.DataFrame, tampil_hist: bool = False):
+    """Grafik sandingan per periode (dipakai Detail Bendungan & kartu carousel).
+
+    Bon A/Bon B/RTOW/ketersediaan/kebutuhan diambil PER PERIODE dari workbook
+    RTOW periodik (bukan interpolasi bulanan). Ketersediaan & kebutuhan air
+    (m3/s) dikonversi ke volume (x hari x 86400) lalu ke elevasi mdpl lewat
+    interpolasi storage curve penuh. Ditambah garis flat elevasi kekeringan &
+    elevasi dasar waduk (fallback kolom SINBAD). Data kosong -> garis tidak
+    digambar (tanpa interpolasi pengganti).
+
+    Return (fig, catatan): catatan = daftar pesan data yang belum tersedia.
+    """
+    kode = g["kode_bendungan"].iloc[0]
+    nama = g["nama_bendungan"].iloc[0]
+    fmt = (g["format_periode"].iloc[0]
+           if "format_periode" in g.columns else "15 Harian")
+    urut = daftar_periode(fmt, 1, 12)
+    real = g[g["jenis"] == "realisasi"]
+    pred = g[g["jenis"] == "prediksi"]
+    pb, kek_b, kurva_b = ambil_periodik(kode, fmt)
+    catatan = []
+
+    fig = go.Figure()
+    if tampil_hist and not hist.empty:
+        h = hist[(hist["kode_bendungan"] == kode)
+                 & (hist["tanggal"] < "2026-01-01")]
+        pertama = True
+        for thn, ht in h.groupby(h["tanggal"].dt.year):
+            s = ht.set_index("periode")["tma"].reindex(urut)
+            fig.add_trace(go.Scatter(
+                x=urut, y=s.values, mode="lines",
+                line=dict(color="#D5DDE5", width=1.2),
+                name="Historis per tahun (2018–2025)", legendgroup="hist",
+                showlegend=pertama, hovertemplate=f"{thn} · %{{x}}: %{{y:.2f}} mdpl"))
+            pertama = False
+
+    # --- garis per periode dari workbook RTOW periodik (sumber baru) ---
+    if pb["rtow"].notna().any():
+        fig.add_trace(go.Scatter(x=urut, y=pb["rtow"].values, mode="lines",
+                                 line=dict(color=WARNA["biru"], width=2, dash="dot"),
+                                 name="RTOW per periode (rencana operasi)"))
+    else:
+        catatan.append("Elevasi rencana RTOW per periode belum tersedia — "
+                       "garis RTOW tidak ditampilkan.")
+    if pb["bon_a"].notna().any():
+        fig.add_trace(go.Scatter(x=urut, y=pb["bon_a"].values, mode="lines",
+                                 line=dict(color=WARNA["amber"], width=2, dash="dashdot"),
+                                 name="Bon A per periode"))
+    if pb["bon_b"].notna().any():
+        fig.add_trace(go.Scatter(x=urut, y=pb["bon_b"].values, mode="lines",
+                                 line=dict(color=WARNA["coral"], width=2, dash="dashdot"),
+                                 name="Bon B per periode"))
+    if pb["bon_a"].isna().all() and pb["bon_b"].isna().all():
+        catatan.append("Nilai Bon A/Bon B per periode belum tersedia — "
+                       "garis Bon tidak ditampilkan.")
+
+    # --- ketersediaan & kebutuhan air: m3/s -> volume -> elevasi ---
+    ada_kk = (pb["ketersediaan_m3s"].notna().any()
+              or pb["kebutuhan_m3s"].notna().any())
+    if ada_kk and kurva_b.empty:
+        catatan.append("Storage curve bendungan ini tidak tersedia — "
+                       "ketersediaan/kebutuhan air tidak dapat dikonversi "
+                       "ke elevasi.")
+    elif ada_kk:
+        for kol, label, warna in (
+                ("ketersediaan_m3s", "Ketersediaan air (konversi elevasi)",
+                 WARNA["teal"]),
+                ("kebutuhan_m3s", "Kebutuhan air (konversi elevasi)",
+                 "#6A1B9A")):
+            s = pd.to_numeric(pb[kol], errors="coerce")
+            if s.notna().any():
+                vol = kc.debit_ke_volume(s, fmt)
+                elev = kc.volume_ke_elevasi(kurva_b, vol.values)
+                elev = np.where(np.isnan(vol.values), np.nan, elev)
+                fig.add_trace(go.Scatter(
+                    x=urut, y=elev, mode="lines",
+                    line=dict(color=warna, width=1.8, dash="dash"),
+                    name=label,
+                    customdata=np.stack([s.values, vol.values / 1e6], axis=-1),
+                    hovertemplate="%{x}: %{y:.2f} mdpl "
+                                  "(%{customdata[0]:.3f} m³/s ≈ "
+                                  "%{customdata[1]:.2f} juta m³)"
+                                  f"<extra>{label}</extra>"))
+    else:
+        catatan.append("Data ketersediaan/kebutuhan air per periode belum "
+                       "tersedia.")
+
+    # --- garis flat elevasi kekeringan & dasar waduk (fallback SINBAD) ---
+    if kek_b is not None and pd.notna(kek_b["elevasi_kekeringan"]):
+        fig.add_trace(go.Scatter(
+            x=urut, y=[float(kek_b["elevasi_kekeringan"])] * len(urut),
+            mode="lines", line=dict(color="#AD1457", width=2, dash="longdash"),
+            name=f"Elevasi kekeringan ({kek_b['sumber_kekeringan']})"))
+    else:
+        catatan.append("Elevasi kekeringan belum tersedia (RTOW maupun SINBAD).")
+    if kek_b is not None and pd.notna(kek_b["elevasi_dasar"]):
+        fig.add_trace(go.Scatter(
+            x=urut, y=[float(kek_b["elevasi_dasar"])] * len(urut),
+            mode="lines", line=dict(color="#6D4C41", width=2, dash="longdashdot"),
+            name=f"Elevasi dasar waduk ({kek_b['sumber_dasar']})"))
+    else:
+        catatan.append("Elevasi dasar waduk belum tersedia (RTOW maupun SINBAD).")
+
+    # --- realisasi & prediksi (metode LSTM TIDAK diubah — hanya tampilan) ---
+    if not real.empty:
+        fig.add_trace(go.Scatter(x=real["periode"], y=real["tma"],
+                                 mode="lines+markers",
+                                 line=dict(color=WARNA["hijau"], width=3),
+                                 marker=dict(size=7), name="TMA Realisasi 2026"))
+    if not pred.empty:
+        x_pred = ([real["periode"].iloc[-1]] if not real.empty else []) + \
+                 list(pred["periode"])
+        y_pred = ([real["tma"].iloc[-1]] if not real.empty else []) + list(pred["tma"])
+        fig.add_trace(go.Scatter(x=x_pred, y=y_pred, mode="lines+markers",
+                                 line=dict(color=WARNA["merah"], width=3, dash="dash"),
+                                 marker=dict(size=7, symbol="square"),
+                                 name="TMA Prediksi LSTM (Agu–Des 2026)"))
+        krit = pred[pred["status_bon"] == KRITIS]
+        if not krit.empty:
+            fig.add_trace(go.Scatter(
+                x=krit["periode"], y=krit["tma"], mode="markers",
+                marker=dict(size=14, symbol="circle-open",
+                            line=dict(color=WARNA["merah"], width=2.5)),
+                name="Periode di bawah BON B", hoverinfo="skip"))
+        if not real.empty:
+            fig.add_vline(x=real["periode"].iloc[-1],
+                          line=dict(color="grey", dash="dot"))
+            fig.add_annotation(x=real["periode"].iloc[-1], yref="paper", y=1.04,
+                               text="realisasi | prediksi", showarrow=False,
+                               font=dict(size=11, color="grey"))
+    fig.update_layout(
+        title=dict(text=f"Sandingan TMA per Periode {fmt} 2026 — Bendungan {nama}",
+                   font=dict(size=18, color=WARNA["navy"])),
+        yaxis_title="TMA (mdpl)", xaxis_title="Periode (bulan-periode)",
+        hovermode="x unified", height=560,
+        legend=dict(orientation="h", y=-0.22), plot_bgcolor="white")
+    fig.update_xaxes(showgrid=True, gridcolor="#EEE", type="category",
+                     categoryorder="array", categoryarray=urut,
+                     tickangle=-90, tickfont=dict(size=9))
+    fig.update_yaxes(showgrid=True, gridcolor="#EEE")
+    return fig, catatan
+
+
+def blok_status_zona(kode: str, fmt: str, g: pd.DataFrame, pb: pd.DataFrame):
+    """Keputusan 3 zona memakai Bon A/Bon B PER PERIODE RTOW berjalan
+    (tanggal berjalan; bila periode itu tanpa data -> periode terakhir yang
+    tersedia). Return (status, label_periode, tma_terkini)."""
+    real = g[g["jenis"] == "realisasi"]
+    tma = float(real["tma"].iloc[-1]) if not real.empty else np.nan
+    punya = pb.index[pb["bon_a"].notna() & pb["bon_b"].notna()]
+    label = kc.periode_aktif(fmt, tersedia=list(punya) if len(punya) else None)
+    ba = pb.loc[label, "bon_a"] if label in pb.index else np.nan
+    bb = pb.loc[label, "bon_b"] if label in pb.index else np.nan
+    status = kc.status_tiga_zona(tma, ba, bb)
+    ikon = {NORMAL: "✅", WASPADA: "⚠️", KRITIS: "🚨", TANPA_BON: "➖"}[status]
+    if status == TANPA_BON:
+        st.markdown(
+            f"**Keputusan 3 zona — periode berjalan {label}:** "
+            + badge_html(f"{ikon} {TANPA_BON}", WARNA_STATUS[TANPA_BON])
+            + " <small>data Bon A/Bon B per periode atau TMA terkini belum "
+              "tersedia — keputusan tidak dipaksakan.</small>",
+            unsafe_allow_html=True)
+    else:
+        st.markdown(
+            f"**Keputusan 3 zona — periode berjalan {label}:** "
+            + badge_html(f"{ikon} {status}", WARNA_STATUS[status])
+            + f" <small>TMA terkini {tma:.2f} mdpl · Bon A {ba:.2f} mdpl · "
+              f"Bon B {bb:.2f} mdpl</small>",
+            unsafe_allow_html=True)
+    return status, label, tma
+
+
+def blok_kecukupan(kode: str, fmt: str, pb: pd.DataFrame):
+    """Blok Kecukupan Air periode berjalan: volume ketersediaan vs kebutuhan
+    (konversi m3/s -> m3), deviasi (m3 & %), status Cukup/Belum cukup.
+    Return (kecukupan_dict_atau_None, label_periode)."""
+    punya = pb.index[pb["ketersediaan_m3s"].notna() & pb["kebutuhan_m3s"].notna()]
+    label = kc.periode_aktif(fmt, tersedia=list(punya) if len(punya) else None)
+    baris = pb.loc[label] if label in pb.index else None
+    kck = (kc.hitung_kecukupan(baris["ketersediaan_m3s"],
+                               baris["kebutuhan_m3s"], fmt)
+           if baris is not None else None)
+    st.markdown(f"**💧 Kecukupan Air — periode berjalan {label}**")
+    if kck is None:
+        st.info("ℹ️ Data ketersediaan/kebutuhan air RTOW periode ini belum "
+                "tersedia — kecukupan air tidak dihitung.")
+        return None, label
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Ketersediaan air", f"{kck['ketersediaan_m3']:,.0f} m³",
+              help="Konversi dari m³/s × jumlah hari periode × 86.400")
+    c2.metric("Kebutuhan air", f"{kck['kebutuhan_m3']:,.0f} m³",
+              help="Konversi dari m³/s × jumlah hari periode × 86.400")
+    teks_pct = ("—" if pd.isna(kck["deviasi_pct"])
+                else f"{kck['deviasi_pct']:+.1f}%")
+    c3.metric("Deviasi (ketersediaan − kebutuhan)",
+              f"{kck['deviasi_m3']:+,.0f} m³", delta=teks_pct,
+              delta_color="normal" if kck["deviasi_m3"] >= 0 else "inverse")
+    ikon = "✅" if kck["status"] == "Cukup" else "🔴"
+    c4.markdown("Status<br>" + badge_html(f"{ikon} {kck['status']}",
+                                          WARNA_STATUS[kck["status"]]),
+                unsafe_allow_html=True)
+    return kck, label
+
+
+def html_infografis(nama, kode, balai, label, status_zona, kck, rek,
+                    k, ketahanan, waktu) -> str:
+    """Infografis PMB (layout kartu, badge status, nilai kunci) — pratinjau
+    di layar & dapat diunduh sebagai HTML mandiri."""
+    warna_badge = {"hijau": "#2E7D32", "amber": "#D98E04",
+                   "merah": "#C62828", "abu": "#9E9E9E"}[rek["warna"]]
+    if kck:
+        baris_kck = (f"<div class='n'><b>{kck['ketersediaan_m3']:,.0f}</b> m³ "
+                     f"ketersediaan</div>"
+                     f"<div class='n'><b>{kck['kebutuhan_m3']:,.0f}</b> m³ "
+                     f"kebutuhan</div>"
+                     f"<div class='n'><b>{kck['deviasi_m3']:+,.0f}</b> m³ "
+                     f"({'—' if pd.isna(kck['deviasi_pct']) else format(kck['deviasi_pct'], '+.1f') + '%'}) deviasi</div>")
+    else:
+        baris_kck = "<div class='n'>Data kecukupan air belum tersedia</div>"
+    if ketahanan is not None and not (isinstance(ketahanan, float)
+                                      and np.isnan(ketahanan)):
+        teks_tahan = ("∞ (tanpa pengurasan bersih)" if np.isinf(ketahanan)
+                      else f"~{ketahanan:.0f} hari")
+    else:
+        teks_tahan = "—"
+    langkah_html = "".join(
+        f"<li>{ik} {tx.replace('**', '')}</li>" for ik, tx in rek["langkah"])
+    return f"""
+<div style="max-width:640px;font-family:Segoe UI,Arial,sans-serif;border:2px solid {WARNA['navy']};border-radius:14px;overflow:hidden;background:#fff">
+  <div style="background:{WARNA['navy']};color:#fff;padding:14px 20px">
+    <div style="font-size:0.8em;letter-spacing:1px">PUSAT MONITORING BENDUNGAN · DDEWOMS</div>
+    <div style="font-size:1.3em;font-weight:700">🧭 Rekomendasi Operasional — {nama} ({kode})</div>
+    <div style="font-size:0.85em">{balai} · periode {label} · {waktu}</div>
+  </div>
+  <div style="padding:16px 20px">
+    <div style="margin-bottom:10px">
+      <span style="background:{warna_badge};color:#fff;padding:4px 14px;border-radius:14px;font-weight:700">{rek['badge']}</span>
+      <span style="background:{WARNA_STATUS.get(status_zona, '#E4E4E4')};padding:4px 14px;border-radius:14px;font-weight:600;margin-left:6px">{status_zona}</span>
+    </div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px">
+      <div class='n' style="font-size:0.95em">Faktor K rekomendasi: <b>{('—' if pd.isna(rek['k_rekomendasi']) else format(rek['k_rekomendasi'], '.2f'))}</b></div>
+      <div class='n' style="font-size:0.95em">Ketahanan air: <b>{teks_tahan}</b></div>
+    </div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:0.95em;margin-bottom:10px">{baris_kck}</div>
+    <ol style="font-size:0.9em;line-height:1.5;padding-left:18px;margin:0">{langkah_html}</ol>
+  </div>
+  <div style="background:#F0F4F8;color:{WARNA['navy']};padding:8px 20px;font-size:0.75em">
+    Subdit OP Bendungan dan Danau · Dit. Bina OP · Ditjen SDA — rekomendasi rule-based Skenario 3 di atas data RTOW periodik (bukan keluaran model LSTM)
+  </div>
+</div>"""
+
+
+def blok_rekomendasi(kode: str, nama: str, balai: str, fmt: str,
+                     g: pd.DataFrame, pb: pd.DataFrame, kek_b, kurva_b,
+                     status_zona: str, label: str, tma: float):
+    """Box Rekomendasi Operasional (Skenario 3, rule-based — tanpa LSTM)."""
+    with st.container(border=True):
+        st.markdown("##### 🧭 Rekomendasi Operasional — Pusat Monitoring "
+                    "Bendungan")
+        if pb[list(KOLOM_PERIODIK)].isna().all().all():
+            st.info("ℹ️ Data RTOW belum tersedia untuk bendungan ini — "
+                    "rekomendasi tidak dihitung.")
+            return
+        minta = st.toggle(
+            "Permintaan pelayanan resmi (UPB/UPI, Kementan, atau pihak lain — "
+            "surat/permohonan resmi)",
+            key=f"minta_{kode}",
+            help="Default 'Tidak' bila belum ada data. Penanda disimpan "
+                 "selama sesi dashboard terbuka.")
+        baris = pb.loc[label] if label in pb.index else None
+        ket = baris["ketersediaan_m3s"] if baris is not None else np.nan
+        keb = baris["kebutuhan_m3s"] if baris is not None else np.nan
+        bon_a = baris["bon_a"] if baris is not None else np.nan
+        bon_b = baris["bon_b"] if baris is not None else np.nan
+        elev_kek = (kek_b["elevasi_kekeringan"]
+                    if kek_b is not None else np.nan)
+        k = kc.faktor_k(ket, keb)
+        kck = kc.hitung_kecukupan(ket, keb, fmt)
+        ketahanan = kc.estimasi_ketahanan_hari(kurva_b, tma, elev_kek, ket, keb)
+        rek = kc.rekomendasi_skenario3(
+            ada_permintaan_resmi=bool(minta), k=k, tma=tma, bon_a=bon_a,
+            bon_b=bon_b, elevasi_kekeringan=elev_kek, kecukupan=kck,
+            ketahanan_hari=ketahanan)
+
+        st.markdown(badge_html(rek["badge"], WARNA_BADGE[rek["warna"]]),
+                    unsafe_allow_html=True)
+        for ikon, teks in rek["langkah"]:
+            st.markdown(f"{ikon} {teks}")
+
+        n1, n2, n3 = st.columns(3)
+        n1.metric("Faktor K rekomendasi",
+                  "—" if pd.isna(rek["k_rekomendasi"])
+                  else f"{rek['k_rekomendasi']:.2f}")
+        if kck:
+            teks_pct = ("—" if pd.isna(kck["deviasi_pct"])
+                        else f"{kck['deviasi_pct']:+.1f}%")
+            n2.metric("Deviasi kecukupan air",
+                      f"{kck['deviasi_m3']:+,.0f} m³", delta=teks_pct,
+                      delta_color="normal" if kck["deviasi_m3"] >= 0
+                      else "inverse")
+        else:
+            n2.metric("Deviasi kecukupan air", "—")
+        if ketahanan is not None and not (isinstance(ketahanan, float)
+                                          and np.isnan(ketahanan)):
+            n3.metric("Estimasi ketahanan air",
+                      "∞" if np.isinf(ketahanan) else f"~{ketahanan:.0f} hari")
+        else:
+            n3.metric("Estimasi ketahanan air", "—")
+
+        if st.button("🖼️ Susun infografis", key=f"btn_info_{kode}"):
+            st.session_state[f"tampil_info_{kode}"] = True
+        if st.session_state.get(f"tampil_info_{kode}"):
+            html = html_infografis(nama, kode, balai, label, status_zona,
+                                   kck, rek, k, ketahanan, waktu_panjang())
+            st.markdown(html, unsafe_allow_html=True)
+            st.download_button(
+                "⬇️ Unduh infografis (HTML, siap dibagikan)",
+                html.encode("utf-8"),
+                file_name=f"infografis_pmb_{kode}_{stamp()}.html",
+                mime="text/html", key=f"dl_info_{kode}")
+
+
+def kartu_bendungan(kode: str):
+    """Kartu pemantauan mirip Detail Bendungan (dipakai carousel depan)."""
+    g = df[df["kode_bendungan"] == kode].sort_values("tanggal")
+    if g.empty:
+        st.info(f"Data bendungan {kode} tidak ditemukan.")
+        return
+    nama = g["nama_bendungan"].iloc[0]
+    balai = g["nama_balai"].iloc[0]
+    fmt = (g["format_periode"].iloc[0]
+           if "format_periode" in g.columns else "15 Harian")
+    st.markdown(f"##### 🏞️ {nama} ({kode}) — {balai} · {g['nama_pulau'].iloc[0]}")
+    fig, catatan = fig_sandingan(g, tampil_hist=False)
+    if catatan:
+        st.caption("ℹ️ Data belum tersedia: " + " · ".join(catatan))
+    st.plotly_chart(fig, use_container_width=True, key=f"car_fig_{kode}")
+    pb, kek_b, kurva_b = ambil_periodik(kode, fmt)
+    status_zona, label, tma = blok_status_zona(kode, fmt, g, pb)
+    blok_kecukupan(kode, fmt, pb)
+    blok_rekomendasi(kode, nama, balai, fmt, g, pb, kek_b, kurva_b,
+                     status_zona, label, tma)
 
 
 # ============================================================ 0. SIAGA KEKERINGAN
@@ -258,7 +659,10 @@ if menu == "🏜️ Siaga Kekeringan":
         fig_b.update_yaxes(showgrid=True, gridcolor="#EEE")
         st.plotly_chart(fig_b, use_container_width=True)
 
-    # -- baris 2: per balai + neraca air per bulan
+    # -- baris 2: per balai + kalender kritis
+    #    (dua kartu neraca lama — jumlah bendungan defisit vs surplus per bulan
+    #     dan 15 defisit air bulanan terbesar Agu–Des — DIHAPUS; bagian
+    #     Kecukupan Air kini berbasis RTOW periodik pada kartu pemantauan)
     c_kiri, c_kanan = st.columns(2)
     with c_kiri:
         per_balai = (per_bdg.groupby("nama_balai")["status_terburuk"]
@@ -286,28 +690,6 @@ if menu == "🏜️ Siaga Kekeringan":
         fig_bl.update_xaxes(showgrid=True, gridcolor="#EEE")
         st.plotly_chart(fig_bl, use_container_width=True)
     with c_kanan:
-        nrc_bulan = (neraca_dff[neraca_dff["status_neraca"] != "Tanpa Data"]
-                     .groupby(["bulan", "status_neraca"]).size()
-                     .unstack(fill_value=0)
-                     .reindex(columns=["Defisit", "Surplus"], fill_value=0))
-        fig_n = go.Figure()
-        for s in ("Defisit", "Surplus"):
-            fig_n.add_trace(go.Bar(
-                x=[BULAN_ID[b] for b in nrc_bulan.index], y=nrc_bulan[s],
-                name=s, marker_color=WARNA_GRAFIK[s],
-                text=nrc_bulan[s], textposition="inside"))
-        fig_n.update_layout(
-            barmode="stack", height=max(380, 26 * len(per_balai) + 120),
-            plot_bgcolor="white",
-            title=dict(text="Neraca air: jumlah bendungan defisit vs surplus per bulan",
-                       font=dict(size=14, color=WARNA["navy"])),
-            yaxis_title="Jumlah bendungan", legend=dict(orientation="h", y=-0.12))
-        fig_n.update_yaxes(showgrid=True, gridcolor="#EEE")
-        st.plotly_chart(fig_n, use_container_width=True)
-
-    # -- baris 3: peta panas bendungan kritis + top defisit
-    c_kiri, c_kanan = st.columns(2)
-    with c_kiri:
         kritis_bdg = per_bdg[per_bdg["bulan_kritis"] > 0].nlargest(30, "skor_prioritas")
         if kritis_bdg.empty:
             st.success("✅ Tidak ada bendungan di bawah BON B pada cakupan filter ini.")
@@ -333,27 +715,65 @@ if menu == "🏜️ Siaga Kekeringan":
                            font=dict(size=14, color=WARNA["navy"])),
                 yaxis=dict(tickfont=dict(size=9)))
             st.plotly_chart(fig_h, use_container_width=True)
-    with c_kanan:
-        top_def = (per_bdg[per_bdg["defisit_terbesar_juta_m3"] > 0]
-                   .nlargest(15, "defisit_terbesar_juta_m3")
-                   .sort_values("defisit_terbesar_juta_m3"))
-        if top_def.empty:
-            st.success("✅ Tidak ada defisit air Agu–Des pada cakupan filter ini.")
-        else:
-            fig_d = go.Figure(go.Bar(
-                y=top_def["nama_bendungan"] + " (" + top_def["kode_bendungan"] + ")",
-                x=top_def["defisit_terbesar_juta_m3"], orientation="h",
-                marker_color=WARNA_GRAFIK["Defisit"],
-                text=top_def["defisit_terbesar_juta_m3"].round(2),
-                textposition="outside"))
-            fig_d.update_layout(
-                height=max(380, 24 * len(top_def) + 120), plot_bgcolor="white",
-                title=dict(text="15 defisit air bulanan terbesar Agu–Des (juta m³)",
-                           font=dict(size=14, color=WARNA["navy"])),
-                xaxis_title="Defisit bulan terparah (juta m³)",
-                yaxis=dict(tickfont=dict(size=10)))
-            fig_d.update_xaxes(showgrid=True, gridcolor="#EEE")
-            st.plotly_chart(fig_d, use_container_width=True)
+
+    # -- pilih bendungan dalam pemantauan + carousel kartu
+    st.markdown("#### 📡 Pilih bendungan dalam pemantauan")
+    st.caption("Hanya bendungan terpilih yang ditampilkan sebagai kartu "
+               "pemantauan di bawah — kartu bergeser otomatis dan dapat "
+               "dijeda / dinavigasi manual.")
+    daf_pantau = (dff[["kode_bendungan", "nama_bendungan", "nama_balai"]]
+                  .drop_duplicates("kode_bendungan")
+                  .sort_values("nama_bendungan"))
+    peta_pantau = daf_pantau.set_index("kode_bendungan")
+    opsi_pantau = list(daf_pantau["kode_bendungan"])
+    bawaan = [k for k in st.session_state.get(
+        "pantau_simpan", kode_kritis[:3] or opsi_pantau[:1])
+        if k in opsi_pantau]
+    pilih_pantau = st.multiselect(
+        "Bendungan dalam pemantauan", opsi_pantau, default=bawaan,
+        format_func=lambda k: (f"{peta_pantau.loc[k, 'nama_bendungan']} ({k}) "
+                               f"— {peta_pantau.loc[k, 'nama_balai']}"))
+    st.session_state["pantau_simpan"] = pilih_pantau
+
+    INTERVAL_CAROUSEL = 12          # detik per kartu saat putar otomatis
+
+    def _geser_kartu(langkah: int, n: int):
+        st.session_state["car_idx"] = (
+            st.session_state.get("car_idx", 0) + langkah) % n
+        st.session_state["car_due"] = time.monotonic() + INTERVAL_CAROUSEL
+
+    if not pilih_pantau:
+        st.info("Pilih minimal satu bendungan untuk menampilkan kartu "
+                "pemantauan.")
+    else:
+        putar = st.toggle("▶️ Putar otomatis (geser antar kartu)",
+                          value=True, key="car_play")
+
+        @st.fragment(run_every=3 if putar and len(pilih_pantau) > 1 else None)
+        def _karusel():
+            n = len(pilih_pantau)
+            kini = time.monotonic()
+            jatuh_tempo = st.session_state.get("car_due")
+            if jatuh_tempo is None:
+                st.session_state["car_due"] = kini + INTERVAL_CAROUSEL
+            elif st.session_state.get("car_play") and kini >= jatuh_tempo:
+                st.session_state["car_idx"] = (
+                    st.session_state.get("car_idx", 0) + 1) % n
+                st.session_state["car_due"] = kini + INTERVAL_CAROUSEL
+            idx = st.session_state.get("car_idx", 0) % n
+            k1, k2, k3 = st.columns([1, 1, 4])
+            k1.button("⏮️ Sebelumnya", key="car_prev",
+                      on_click=_geser_kartu, args=(-1, n))
+            k2.button("⏭️ Berikutnya", key="car_next",
+                      on_click=_geser_kartu, args=(+1, n))
+            k3.caption(f"Kartu **{idx + 1} dari {n}** — "
+                       + (f"bergeser otomatis tiap {INTERVAL_CAROUSEL} detik "
+                          f"(jeda lewat tombol di atas)"
+                          if st.session_state.get("car_play")
+                          else "putar otomatis dijeda"))
+            kartu_bendungan(pilih_pantau[idx])
+
+        _karusel()
 
     # -- daftar prioritas gabungan
     st.markdown("#### 🎯 Daftar Prioritas Perhatian")
@@ -479,78 +899,16 @@ elif menu == "📈 Detail Bendungan":
     fmt = g["format_periode"].iloc[0] if "format_periode" in g.columns else "15 Harian"
     real = g[g["jenis"] == "realisasi"]
     pred = g[g["jenis"] == "prediksi"]
-    from src.utils import daftar_periode
     urut = daftar_periode(fmt, 1, 12)                 # '01-01' ... '12-02'/'12-03'
-    d = g.drop_duplicates("periode").set_index("periode").reindex(urut)
 
     st.caption(f"{g['nama_balai'].iloc[0]} · {g['nama_pulau'].iloc[0]} · "
                f"skala periode **{fmt}** ({len(urut)} periode/tahun, sesuai "
-               f"format RTOW)")
+               f"format RTOW) · Bon A/B, RTOW, ketersediaan & kebutuhan air "
+               f"per periode dari workbook RTOW periodik")
 
-    fig = go.Figure()
-    if tampil_hist and not hist.empty:
-        h = hist[(hist["kode_bendungan"] == pilihan)
-                 & (hist["tanggal"] < "2026-01-01")]
-        pertama = True
-        for thn, ht in h.groupby(h["tanggal"].dt.year):
-            s = ht.set_index("periode")["tma"].reindex(urut)
-            fig.add_trace(go.Scatter(
-                x=urut, y=s.values, mode="lines",
-                line=dict(color="#D5DDE5", width=1.2),
-                name="Historis per tahun (2018–2025)", legendgroup="hist",
-                showlegend=pertama, hovertemplate=f"{thn} · %{{x}}: %{{y:.2f}} mdpl"))
-            pertama = False
-    if "rtow" in d.columns and d["rtow"].notna().any():
-        fig.add_trace(go.Scatter(x=urut, y=d["rtow"], mode="lines",
-                                 line=dict(color=WARNA["biru"], width=2, dash="dot"),
-                                 name="RTOW (rencana operasi)"))
-    if d["bon_a"].notna().any():
-        fig.add_trace(go.Scatter(x=urut, y=d["bon_a"], mode="lines",
-                                 line=dict(color=WARNA["amber"], width=2, dash="dashdot"),
-                                 name="BON A"))
-    if d["bon_b"].notna().any():
-        fig.add_trace(go.Scatter(x=urut, y=d["bon_b"], mode="lines",
-                                 line=dict(color=WARNA["coral"], width=2, dash="dashdot"),
-                                 name="BON B"))
-    if d["bon_a"].isna().all() and d["bon_b"].isna().all():
-        st.info("ℹ️ Bendungan ini belum memiliki data BON A/B pada file referensi — "
-                "status prediksi tidak dapat dinilai.")
-    if not real.empty:
-        fig.add_trace(go.Scatter(x=real["periode"], y=real["tma"],
-                                 mode="lines+markers",
-                                 line=dict(color=WARNA["hijau"], width=3),
-                                 marker=dict(size=7), name="TMA Realisasi 2026"))
-    if not pred.empty:
-        x_pred = ([real["periode"].iloc[-1]] if not real.empty else []) + \
-                 list(pred["periode"])
-        y_pred = ([real["tma"].iloc[-1]] if not real.empty else []) + list(pred["tma"])
-        fig.add_trace(go.Scatter(x=x_pred, y=y_pred, mode="lines+markers",
-                                 line=dict(color=WARNA["merah"], width=3, dash="dash"),
-                                 marker=dict(size=7, symbol="square"),
-                                 name="TMA Prediksi LSTM (Agu–Des 2026)"))
-        krit = pred[pred["status_bon"] == KRITIS]
-        if not krit.empty:
-            fig.add_trace(go.Scatter(
-                x=krit["periode"], y=krit["tma"], mode="markers",
-                marker=dict(size=14, symbol="circle-open",
-                            line=dict(color=WARNA["merah"], width=2.5)),
-                name="Periode di bawah BON B", hoverinfo="skip"))
-        if not real.empty:
-            fig.add_vline(x=real["periode"].iloc[-1],
-                          line=dict(color="grey", dash="dot"))
-            fig.add_annotation(x=real["periode"].iloc[-1], yref="paper", y=1.04,
-                               text="realisasi | prediksi", showarrow=False,
-                               font=dict(size=11, color="grey"))
-    fig.update_layout(
-        title=dict(text=f"Sandingan TMA per Periode {fmt} 2026 — Bendungan {nama}",
-                   font=dict(size=18, color=WARNA["navy"])),
-        yaxis_title="TMA (mdpl)", xaxis_title="Periode (bulan-periode)",
-        hovermode="x unified", height=560,
-        legend=dict(orientation="h", y=-0.22), plot_bgcolor="white")
-    fig.update_xaxes(showgrid=True, gridcolor="#EEE", type="category",
-                     categoryorder="array", categoryarray=urut,
-                     tickangle=-90, tickfont=dict(size=9))
-    fig.update_yaxes(showgrid=True, gridcolor="#EEE")
+    fig, catatan = fig_sandingan(g, tampil_hist)
+    if catatan:
+        st.info("ℹ️ " + " · ".join(catatan))
     st.plotly_chart(fig, use_container_width=True)
 
     c1, c2, c3, c4 = st.columns(4)
@@ -569,6 +927,10 @@ elif menu == "📈 Detail Bendungan":
         kritis = pred[lap.dibawah_bon(pred["status_bon"])]
         c4.metric("Periode prediksi di bawah BON A",
                   f"{len(kritis)} dari {len(pred)}")
+
+    # ---------- keputusan 3 zona periode RTOW berjalan (workbook baru) ----------
+    pb, kek_b, kurva_b = ambil_periodik(pilihan, fmt)
+    status_zona, label_aktif, tma_kini = blok_status_zona(pilihan, fmt, g, pb)
 
     # ---------- hasil analisis gabungan ----------
     st.markdown("##### 🔎 Hasil Analisis")
@@ -616,49 +978,69 @@ elif menu == "📈 Detail Bendungan":
     st.dataframe(warnai_status(tampil, "status_bon"), width="stretch",
                  hide_index=True)
 
-    # ---------- neraca air: kebutuhan vs ketersediaan ----------
-    st.markdown("##### 💧 Neraca Air: Kebutuhan vs Ketersediaan")
-    n_b = neraca[neraca["kode_bendungan"] == pilihan].sort_values("bulan")
-    if n_b.empty or (n_b["status_neraca"] == "Tanpa Data").all():
-        st.info("ℹ️ Bendungan ini belum memiliki data ketersediaan/kebutuhan "
-                "air pada file referensi.")
+    # ---------- kecukupan air: kebutuhan vs ketersediaan (RTOW periodik) ----------
+    st.markdown("##### 💧 Kecukupan Air: Kebutuhan vs Ketersediaan "
+                "(RTOW per periode)")
+    ada_kck = (pb["ketersediaan_m3s"].notna() & pb["kebutuhan_m3s"].notna())
+    if not ada_kck.any():
+        st.info("ℹ️ Data ketersediaan/kebutuhan air per periode belum tersedia "
+                "pada workbook RTOW — kecukupan air belum dapat dinilai.")
     else:
-        narasi_n = lap.narasi_neraca(n_b)
-        if (n_b["status_neraca"] == "Defisit").any():
-            st.warning(f"⚠️ {narasi_n}")
-        else:
-            st.success(f"✅ {narasi_n}")
+        blok_kecukupan(pilihan, fmt, pb)
 
-        nb = n_b.copy()
-        nb["nama_bulan"] = nb["bulan"].map(BULAN_ID)
-        fig_n = go.Figure()
-        fig_n.add_trace(go.Bar(
-            x=nb["nama_bulan"], y=(nb["ketersediaan_m3"] / 1e6).round(3),
+        tk = pb.copy()
+        tk["ketersediaan_m3"] = kc.debit_ke_volume(
+            pd.to_numeric(tk["ketersediaan_m3s"], errors="coerce"), fmt)
+        tk["kebutuhan_m3"] = kc.debit_ke_volume(
+            pd.to_numeric(tk["kebutuhan_m3s"], errors="coerce"), fmt)
+        tk["deviasi_m3"] = tk["ketersediaan_m3"] - tk["kebutuhan_m3"]
+        tk["deviasi_pct"] = np.where(
+            tk["kebutuhan_m3"] > 0,
+            tk["deviasi_m3"] / tk["kebutuhan_m3"] * 100, np.nan)
+        lengkap = tk["ketersediaan_m3"].notna() & tk["kebutuhan_m3"].notna()
+        tk["status_kecukupan"] = np.select(
+            [lengkap & (tk["deviasi_m3"] >= 0), lengkap],
+            ["Cukup", "Belum cukup"], "Tanpa Data")
+
+        fig_k = go.Figure()
+        fig_k.add_trace(go.Bar(
+            x=tk.index, y=(tk["ketersediaan_m3"] / 1e6).round(3),
             name="Ketersediaan air", marker_color=WARNA["teal"]))
-        fig_n.add_trace(go.Bar(
-            x=nb["nama_bulan"], y=(nb["kebutuhan_m3"] / 1e6).round(3),
+        fig_k.add_trace(go.Bar(
+            x=tk.index, y=(tk["kebutuhan_m3"] / 1e6).round(3),
             name="Kebutuhan air", marker_color=WARNA["navy"]))
-        # tanda defisit di atas pasangan batang
-        def_b = nb[nb["status_neraca"] == "Defisit"]
-        if not def_b.empty:
-            fig_n.add_trace(go.Scatter(
-                x=def_b["nama_bulan"],
-                y=(def_b[["ketersediaan_m3", "kebutuhan_m3"]].max(axis=1) / 1e6) * 1.06,
-                mode="text", text="▼ defisit", textfont=dict(color=WARNA["merah"], size=11),
+        blm = tk[tk["status_kecukupan"] == "Belum cukup"]
+        if not blm.empty:
+            fig_k.add_trace(go.Scatter(
+                x=blm.index,
+                y=(blm[["ketersediaan_m3", "kebutuhan_m3"]].max(axis=1) / 1e6) * 1.06,
+                mode="text", text="▼ belum cukup",
+                textfont=dict(color=WARNA["merah"], size=11),
                 showlegend=False, hoverinfo="skip"))
-        fig_n.update_layout(
+        fig_k.update_layout(
             barmode="group", height=380, plot_bgcolor="white",
-            yaxis_title="Volume (juta m³/bulan)", hovermode="x unified",
-            legend=dict(orientation="h", y=-0.2),
-            title=dict(text=f"Neraca Air Bulanan — Bendungan {nama}",
+            yaxis_title="Volume (juta m³/periode)", hovermode="x unified",
+            legend=dict(orientation="h", y=-0.25),
+            title=dict(text=f"Kecukupan Air per Periode {fmt} — Bendungan {nama}",
                        font=dict(size=15, color=WARNA["navy"])))
-        fig_n.update_yaxes(showgrid=True, gridcolor="#EEE")
-        st.plotly_chart(fig_n, use_container_width=True)
+        fig_k.update_xaxes(type="category", categoryorder="array",
+                           categoryarray=urut, tickangle=-90,
+                           tickfont=dict(size=9))
+        fig_k.update_yaxes(showgrid=True, gridcolor="#EEE")
+        st.plotly_chart(fig_k, use_container_width=True)
 
-        st.dataframe(warnai_status(
-            lap.tabel_neraca(n_b).drop(columns=["kode_bendungan",
-                                                "nama_bendungan", "bulan"]),
-            "status_neraca"), width="stretch", hide_index=True)
+        tampil_k = tk.reset_index().rename(columns={"index": "periode"})
+        tampil_k = tampil_k[["periode", "ketersediaan_m3s", "kebutuhan_m3s",
+                             "ketersediaan_m3", "kebutuhan_m3", "deviasi_m3",
+                             "deviasi_pct", "status_kecukupan"]].round(
+            {"ketersediaan_m3s": 3, "kebutuhan_m3s": 3, "ketersediaan_m3": 0,
+             "kebutuhan_m3": 0, "deviasi_m3": 0, "deviasi_pct": 1})
+        st.dataframe(warnai_status(tampil_k, "status_kecukupan"),
+                     width="stretch", hide_index=True)
+
+    # ---------- rekomendasi operasional (Skenario 3, rule-based) ----------
+    blok_rekomendasi(pilihan, nama, g["nama_balai"].iloc[0], fmt, g, pb,
+                     kek_b, kurva_b, status_zona, label_aktif, tma_kini)
 
     st.markdown("##### Unduh untuk bendungan ini")
     u1, u2 = st.columns(2)

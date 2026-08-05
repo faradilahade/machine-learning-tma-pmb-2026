@@ -4,9 +4,15 @@
 config.yaml
 .streamlit/secrets.toml
 
-# Data mentah hasil ekstraksi database internal (tidak dipakai dashboard;
-# regenerasi dengan: python run_pipeline.py di jaringan internal)
-data/raw/
+# Data mentah hasil ekstraksi database internal (regenerasi dengan:
+# python run_pipeline.py di jaringan internal). KECUALI storage curve —
+# dipakai dashboard untuk konversi volume <-> elevasi (kecukupan air).
+data/raw/*
+!data/raw/storagecurve_harian.parquet
+
+# File lock Excel (workbook sedang terbuka)
+~$*
+**/~$*
 
 # Python
 __pycache__/

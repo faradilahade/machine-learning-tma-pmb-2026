@@ -1,4 +1,4 @@
-id;nama_bendungan;format
+﻿id;nama_bendungan;format
 54;NAWANGAN;15 Harian
 53;NGANCAR;15 Harian
 320;PIDEKSO;15 Harian
@@ -62,17 +62,17 @@ id;nama_bendungan;format
 314;WAY SEKAMPUNG;15 Harian
 6;WAY JEPARA;15 Harian
 7;WAY RAREM;15 Harian
-173;JAMBU;10 Harian
-169;KEMPO;10 Harian
-167;KESI;10 Harian
+173;JAMBU;15 Harian
+169;KEMPO;15 Harian
+167;KESI;15 Harian
 171;LANANGGA;15 Harian
 174;LASI II;15 Harian
 303;MILA;15 Harian
 162;SANEO;15 Harian
 132;SANGGUPASANTE;15 Harian
-114;SONCOLOPI;10 Harian
+114;SONCOLOPI;15 Harian
 302;TANJU;10 Harian
-130;TONDA SELATAN;10 Harian
+130;TONDA SELATAN;15 Harian
 170;KOWO;10 Harian
 142;LAJU;10 Harian
 149;NCERA;10 Harian
@@ -210,4 +210,4 @@ id;nama_bendungan;format
 12;RAJUI;15 Harian
 9;SIANJO-ANJO;15 Harian
 306;SEI GONG;15 Harian
-306;SEI GONG;15 Harian
+329;SEI PULAI;15 Harian

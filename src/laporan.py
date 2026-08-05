@@ -639,7 +639,7 @@ def kesimpulan_nasional(df: pd.DataFrame, neraca: pd.DataFrame | None = None,
                   f"{BULAN_ID[int(terbesar.iloc[0]['bulan'])]})."
                   if not terbesar.empty else "")
         par.append(
-            f"Neraca air musim kering (Agu–Des): {n_def} bendungan mengalami "
+            f"Kecukupan air musim kering (Agu–Des): {n_def} bendungan mengalami "
             f"DEFISIT (kebutuhan > ketersediaan) dengan total defisit "
             f"{tot_def:,.1f} juta m³.{contoh} Bendungan surplus tetap perlu "
             f"menjaga pola operasi agar tampungan aman hingga akhir tahun.")
