@@ -276,36 +276,8 @@ def fig_sandingan(g: pd.DataFrame, tampil_hist: bool = False):
         catatan.append("Nilai Bon A/Bon B per periode belum tersedia — "
                        "garis Bon tidak ditampilkan.")
 
-    # --- ketersediaan & kebutuhan air: m3/s -> volume -> elevasi ---
-    ada_kk = (pb["ketersediaan_m3s"].notna().any()
-              or pb["kebutuhan_m3s"].notna().any())
-    if ada_kk and kurva_b.empty:
-        catatan.append("Storage curve bendungan ini tidak tersedia — "
-                       "ketersediaan/kebutuhan air tidak dapat dikonversi "
-                       "ke elevasi.")
-    elif ada_kk:
-        for kol, label, warna in (
-                ("ketersediaan_m3s", "Ketersediaan air (konversi elevasi)",
-                 WARNA["teal"]),
-                ("kebutuhan_m3s", "Kebutuhan air (konversi elevasi)",
-                 "#6A1B9A")):
-            s = pd.to_numeric(pb[kol], errors="coerce")
-            if s.notna().any():
-                vol = kc.debit_ke_volume(s, fmt)
-                elev = kc.volume_ke_elevasi(kurva_b, vol.values)
-                elev = np.where(np.isnan(vol.values), np.nan, elev)
-                fig.add_trace(go.Scatter(
-                    x=urut, y=elev, mode="lines",
-                    line=dict(color=warna, width=1.8, dash="dash"),
-                    name=label,
-                    customdata=np.stack([s.values, vol.values / 1e6], axis=-1),
-                    hovertemplate="%{x}: %{y:.2f} mdpl "
-                                  "(%{customdata[0]:.3f} m³/s ≈ "
-                                  "%{customdata[1]:.2f} juta m³)"
-                                  f"<extra>{label}</extra>"))
-    else:
-        catatan.append("Data ketersediaan/kebutuhan air per periode belum "
-                       "tersedia.")
+    # (garis ketersediaan/kebutuhan hasil konversi ke elevasi DIHAPUS dari
+    #  grafik — nilai m³ tetap ditampilkan pada blok Kecukupan Air)
 
     # --- garis flat elevasi kekeringan & dasar waduk (fallback SINBAD) ---
     if kek_b is not None and pd.notna(kek_b["elevasi_kekeringan"]):
@@ -422,6 +394,41 @@ def blok_kecukupan(kode: str, fmt: str, pb: pd.DataFrame):
                                           WARNA_STATUS[kck["status"]]),
                 unsafe_allow_html=True)
     return kck, label
+
+
+def blok_catatan_rtow(pb: pd.DataFrame):
+    """Keterangan per bendungan: periode dengan elevasi rencana RTOW yang
+    TIDAK berada di antara Bon A–Bon B (dinilai dari workbook RTOW periodik)."""
+    dinilai = pb.dropna(subset=["rtow", "bon_a", "bon_b"])
+    if dinilai.empty:
+        st.caption("📝 **Catatan RTOW:** nilai RTOW/Bon A/Bon B per periode "
+                   "belum lengkap — posisi RTOW terhadap rentang Bon A–B "
+                   "belum dapat dinilai.")
+        return
+    luar = kc.rtow_luar_bon(dinilai.reset_index().rename(
+        columns={"index": "periode"}))
+    if luar.empty:
+        st.success(f"📝 **Catatan RTOW:** elevasi rencana RTOW berada di "
+                   f"antara Bon A–Bon B pada seluruh {len(dinilai)} periode "
+                   f"yang dapat dinilai.")
+        return
+    atas = luar[luar["posisi_rtow"] == kc.POSISI_ATAS_A]["periode"]
+    bawah = luar[luar["posisi_rtow"] == kc.POSISI_BAWAH_B]["periode"]
+
+    def _daftar(s):
+        s = list(s)
+        return ", ".join(s[:8]) + (" …" if len(s) > 8 else "")
+
+    rincian = []
+    if len(atas):
+        rincian.append(f"**{len(atas)} periode di atas Bon A** ({_daftar(atas)})")
+    if len(bawah):
+        rincian.append(f"**{len(bawah)} periode di bawah Bon B** ({_daftar(bawah)})")
+    st.warning(f"📝 **Catatan RTOW:** pada {len(luar)} dari {len(dinilai)} "
+               f"periode yang dapat dinilai, elevasi rencana RTOW berada "
+               f"**di luar** rentang Bon A–Bon B — {' · '.join(rincian)}. "
+               f"Nilai RTOW/Bon periode tersebut perlu diverifikasi ke "
+               f"pengelola bendungan.")
 
 
 def html_infografis(nama, kode, balai, label, status_zona, kck, rek,
@@ -559,6 +566,7 @@ def kartu_bendungan(kode: str):
     st.plotly_chart(fig, use_container_width=True, key=f"car_fig_{kode}")
     pb, kek_b, kurva_b = ambil_periodik(kode, fmt)
     status_zona, label, tma = blok_status_zona(kode, fmt, g, pb)
+    blok_catatan_rtow(pb)
     blok_kecukupan(kode, fmt, pb)
     blok_rekomendasi(kode, nama, balai, fmt, g, pb, kek_b, kurva_b,
                      status_zona, label, tma)
@@ -775,6 +783,72 @@ if menu == "🏜️ Siaga Kekeringan":
 
         _karusel()
 
+    # -- rekap catatan RTOW vs Bon A-B (workbook RTOW periodik)
+    st.markdown("#### 📝 Rekap Catatan RTOW vs Bon A–B")
+    st.caption("Periode dengan **elevasi rencana RTOW di luar rentang "
+               "Bon A–Bon B** (dinilai per periode dari workbook RTOW "
+               "periodik; periode dengan nilai kosong tidak dinilai) — "
+               "indikasi nilai RTOW/Bon yang perlu diverifikasi ke pengelola. "
+               "Keterangan rinci per bendungan tersedia pada kartu pemantauan "
+               "di atas dan menu 📈 Detail Bendungan.")
+    rp_dff = (rtow_p[rtow_p["kode_bendungan"].isin(dff["kode_bendungan"]
+                                                   .unique())]
+              if not rtow_p.empty else pd.DataFrame())
+    dinilai_rp = (rp_dff.dropna(subset=["rtow", "bon_a", "bon_b"])
+                  if not rp_dff.empty else pd.DataFrame())
+    if dinilai_rp.empty:
+        st.info("ℹ️ Nilai RTOW/Bon A/Bon B per periode belum tersedia pada "
+                "workbook untuk bendungan terfilter — rekap belum dapat "
+                "disusun.")
+    else:
+        rekap_rtow = kc.rekap_rtow_luar_bon(rp_dff)
+        n_dinilai_bdg = dinilai_rp["kode_bendungan"].nunique()
+        r1, r2, r3, r4 = st.columns(4)
+        r1.metric("Bendungan dinilai", n_dinilai_bdg)
+        r2.metric("⚠️ RTOW di luar Bon A–B",
+                  0 if rekap_rtow.empty else len(rekap_rtow))
+        r3.metric("Periode di atas Bon A",
+                  0 if rekap_rtow.empty else int(rekap_rtow["n_diatas_bon_a"].sum()))
+        r4.metric("Periode di bawah Bon B",
+                  0 if rekap_rtow.empty else int(rekap_rtow["n_dibawah_bon_b"].sum()))
+        if rekap_rtow.empty:
+            st.success("✅ Elevasi rencana RTOW seluruh bendungan terfilter "
+                       "berada di antara Bon A–Bon B pada semua periode "
+                       "yang dapat dinilai.")
+        else:
+            nama_w = daftar[["kode_bendungan", "nama_bendungan"]].merge(
+                dff[["kode_bendungan", "nama_balai"]]
+                .drop_duplicates("kode_bendungan"), on="kode_bendungan")
+            tampil_rtow = (rekap_rtow.merge(nama_w, on="kode_bendungan",
+                                            how="left")
+                           [["kode_bendungan", "nama_bendungan", "nama_balai",
+                             "n_periode_dinilai", "n_luar_bon",
+                             "n_diatas_bon_a", "n_dibawah_bon_b",
+                             "periode_luar"]])
+            st.dataframe(
+                tampil_rtow, width="stretch", hide_index=True,
+                column_config={
+                    "n_periode_dinilai": st.column_config.NumberColumn(
+                        "periode dinilai"),
+                    "n_luar_bon": st.column_config.NumberColumn(
+                        "periode di luar Bon A–B"),
+                    "n_diatas_bon_a": st.column_config.NumberColumn(
+                        "di atas Bon A"),
+                    "n_dibawah_bon_b": st.column_config.NumberColumn(
+                        "di bawah Bon B"),
+                    "periode_luar": st.column_config.TextColumn(
+                        "contoh periode", width="large")})
+            buf_rtow = io.BytesIO()
+            with pd.ExcelWriter(buf_rtow, engine="xlsxwriter") as w:
+                tampil_rtow.to_excel(w, sheet_name="RTOW luar Bon A-B",
+                                     index=False)
+            st.download_button(
+                "📊 Unduh rekap RTOW di luar Bon A–B (Excel)",
+                buf_rtow.getvalue(),
+                file_name=f"rekap_rtow_luar_bon_{stamp()}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument."
+                     "spreadsheetml.sheet")
+
     # -- daftar prioritas gabungan
     st.markdown("#### 🎯 Daftar Prioritas Perhatian")
     st.caption("Skor prioritas = 3×bulan di bawah BON B + 1×bulan di antara "
@@ -931,6 +1005,7 @@ elif menu == "📈 Detail Bendungan":
     # ---------- keputusan 3 zona periode RTOW berjalan (workbook baru) ----------
     pb, kek_b, kurva_b = ambil_periodik(pilihan, fmt)
     status_zona, label_aktif, tma_kini = blok_status_zona(pilihan, fmt, g, pb)
+    blok_catatan_rtow(pb)
 
     # ---------- hasil analisis gabungan ----------
     st.markdown("##### 🔎 Hasil Analisis")

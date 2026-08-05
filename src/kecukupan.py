@@ -219,6 +219,62 @@ def periode_aktif(fmt: str, tanggal=None, tersedia=None) -> str:
     return label
 
 
+# ------------------------------------------------------------------ catatan RTOW
+POSISI_ATAS_A = "di atas Bon A"
+POSISI_BAWAH_B = "di bawah Bon B"
+
+
+def rtow_luar_bon(df: pd.DataFrame) -> pd.DataFrame:
+    """Baris dengan elevasi rencana RTOW di LUAR rentang Bon A–Bon B.
+
+    Menerima frame berkolom rtow/bon_a/bon_b (mis. pb per bendungan atau
+    gabungan semua bendungan). Baris dengan salah satu nilai kosong dilewati
+    (tidak dinilai). Kolom tambahan `posisi_rtow`: 'di atas Bon A' /
+    'di bawah Bon B'.
+    """
+    if df is None or df.empty:
+        return pd.DataFrame(columns=list(df.columns if df is not None else [])
+                            + ["posisi_rtow"])
+    d = df.dropna(subset=["rtow", "bon_a", "bon_b"]).copy()
+    d["posisi_rtow"] = np.select(
+        [d["rtow"] > d["bon_a"], d["rtow"] < d["bon_b"]],
+        [POSISI_ATAS_A, POSISI_BAWAH_B], "")
+    return d[d["posisi_rtow"] != ""]
+
+
+def rekap_rtow_luar_bon(df: pd.DataFrame) -> pd.DataFrame:
+    """Rekap per bendungan: jumlah periode RTOW di luar Bon A–B.
+
+    df = frame periodik gabungan (harus berkolom kode_bendungan, periode,
+    rtow, bon_a, bon_b). Return per bendungan: n_periode_dinilai,
+    n_luar_bon, n_diatas_bon_a, n_dibawah_bon_b, daftar periode.
+    """
+    if df is None or df.empty or "kode_bendungan" not in df.columns:
+        return pd.DataFrame()
+    dinilai = df.dropna(subset=["rtow", "bon_a", "bon_b"])
+    if dinilai.empty:
+        return pd.DataFrame()
+    luar = rtow_luar_bon(dinilai)
+    n_dinilai = dinilai.groupby("kode_bendungan").size().rename("n_periode_dinilai")
+    if luar.empty:
+        return pd.DataFrame()
+    rekap = (luar.assign(
+                atas=luar["posisi_rtow"] == POSISI_ATAS_A,
+                bawah=luar["posisi_rtow"] == POSISI_BAWAH_B)
+             .groupby("kode_bendungan")
+             .agg(n_luar_bon=("posisi_rtow", "size"),
+                  n_diatas_bon_a=("atas", "sum"),
+                  n_dibawah_bon_b=("bawah", "sum"),
+                  periode_luar=("periode",
+                                lambda s: ", ".join(list(s)[:8])
+                                + (" …" if len(s) > 8 else "")))
+             .reset_index())
+    rekap = rekap.merge(n_dinilai, on="kode_bendungan", how="left")
+    for c in ("n_luar_bon", "n_diatas_bon_a", "n_dibawah_bon_b"):
+        rekap[c] = rekap[c].astype(int)
+    return rekap.sort_values("n_luar_bon", ascending=False).reset_index(drop=True)
+
+
 # ------------------------------------------------------------------ keputusan
 def status_tiga_zona(elevasi, bon_a, bon_b) -> str:
     """Keputusan 3 zona memakai Bon A/Bon B PER PERIODE (bukan interpolasi):
