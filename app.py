@@ -698,7 +698,19 @@ if menu == "🏜️ Siaga Kekeringan":
         fig_bl.update_xaxes(showgrid=True, gridcolor="#EEE")
         st.plotly_chart(fig_bl, use_container_width=True)
     with c_kanan:
-        kritis_bdg = per_bdg[per_bdg["bulan_kritis"] > 0].nlargest(30, "skor_prioritas")
+        # 30 bendungan prioritas: yang di bawah BON B bulan Agustus dulu,
+        # lalu September, lalu Oktober; sesama kelompok diurut skor prioritas
+        kritis_agu_okt = (sbm[sbm["status_bon"] == KRITIS]
+                          .pivot_table(index="kode_bendungan", columns="bulan",
+                                       values="status_bon", aggfunc="size")
+                          .notna())
+        urutan = per_bdg.merge(kritis_agu_okt, left_on="kode_bendungan",
+                               right_index=True, how="left")
+        for b in (8, 9, 10):
+            urutan[b] = (urutan[b].eq(True) if b in urutan.columns else False)
+        kritis_bdg = (urutan[urutan["bulan_kritis"] > 0]
+                      .sort_values([8, 9, 10, "skor_prioritas"],
+                                   ascending=False).head(30))
         if kritis_bdg.empty:
             st.success("✅ Tidak ada bendungan di bawah BON B pada cakupan filter ini.")
         else:
@@ -707,18 +719,26 @@ if menu == "🏜️ Siaga Kekeringan":
                    .assign(b=lambda d: d["status_bon"].map(bobot))
                    .pivot_table(index="nama_bendungan", columns="bulan",
                                 values="b", aggfunc="max"))
-            piv = piv.loc[piv.max(axis=1).sort_values().index]
+            # baris mengikuti urutan prioritas; dibalik karena sumbu-y plotly
+            # menggambar kategori dari bawah -> prioritas #1 tampil paling atas
+            piv = piv.reindex(kritis_bdg["nama_bendungan"]).iloc[::-1]
+            # Series.map per kolom (DataFrame.replace int->str memicu
+            # IndexError copy-on-write pada pandas >= 2.3)
+            peta_label = {0: "Di atas BON A", 1: "Di antara BON A-B",
+                          2: "Di bawah BON B"}
+            label_sel = (piv.apply(lambda kol: kol.map(peta_label))
+                         .fillna("Tanpa data").values)
             fig_h = go.Figure(go.Heatmap(
                 z=piv.values, x=[BULAN_ID[b] for b in piv.columns], y=piv.index,
                 zmin=0, zmax=2, showscale=False, xgap=2, ygap=2,
                 colorscale=[[0, "#C6EFCE"], [0.5, WARNA_GRAFIK[WASPADA]],
                             [1, WARNA_GRAFIK[KRITIS]]],
                 hovertemplate="%{y} · %{x}: %{customdata}<extra></extra>",
-                customdata=piv.replace({0: "Di atas BON A", 1: "Di antara BON A-B",
-                                        2: "Di bawah BON B"}).values))
+                customdata=label_sel))
             fig_h.update_layout(
                 height=max(380, 16 * len(piv) + 130), plot_bgcolor="white",
-                title=dict(text=f"Kalender kritis {len(piv)} bendungan prioritas "
+                title=dict(text=f"Kalender kritis {len(piv)} bendungan prioritas — "
+                                f"urut di bawah BON B Agu → Sep → Okt "
                                 f"(merah = di bawah BON B)",
                            font=dict(size=14, color=WARNA["navy"])),
                 yaxis=dict(tickfont=dict(size=9)))
@@ -726,16 +746,20 @@ if menu == "🏜️ Siaga Kekeringan":
 
     # -- pilih bendungan dalam pemantauan + carousel kartu
     st.markdown("#### 📡 Pilih bendungan dalam pemantauan")
-    st.caption("Hanya bendungan terpilih yang ditampilkan sebagai kartu "
-               "pemantauan di bawah — kartu bergeser otomatis dan dapat "
-               "dijeda / dinavigasi manual.")
+    st.caption("Bawaan: seluruh bendungan **kritis di bawah BON B pada "
+               "Agustus 2026**. Hanya bendungan terpilih yang ditampilkan "
+               "sebagai kartu pemantauan di bawah — kartu bergeser otomatis "
+               "dan dapat dijeda / dinavigasi manual.")
     daf_pantau = (dff[["kode_bendungan", "nama_bendungan", "nama_balai"]]
                   .drop_duplicates("kode_bendungan")
                   .sort_values("nama_bendungan"))
     peta_pantau = daf_pantau.set_index("kode_bendungan")
     opsi_pantau = list(daf_pantau["kode_bendungan"])
+    kode_kritis_agu = sorted(
+        sbm[(sbm["bulan"] == 8) & (sbm["status_bon"] == KRITIS)]
+        ["kode_bendungan"].unique())
     bawaan = [k for k in st.session_state.get(
-        "pantau_simpan", kode_kritis[:3] or opsi_pantau[:1])
+        "pantau_simpan", kode_kritis_agu or kode_kritis[:3] or opsi_pantau[:1])
         if k in opsi_pantau]
     pilih_pantau = st.multiselect(
         "Bendungan dalam pemantauan", opsi_pantau, default=bawaan,
