@@ -49,7 +49,7 @@ def main():
     jalankan("src/evaluasi.py")
 
     print("\n" + "=" * 60)
-    print("PIPELINE SELESAI ✔")
+    print("PIPELINE SELESAI (OK)")  # tanpa simbol unicode: konsol Windows cp1252
     print("Grafik statis : output/grafik/")
     print("Hasil prediksi: output/prediksi/prediksi_tma_2026.xlsx")
     print("Dashboard     : streamlit run app.py")

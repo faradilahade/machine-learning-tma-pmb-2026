@@ -415,24 +415,24 @@
     },
     "BD061": {
       "tma_min": 28.018,
-      "tma_max": 29.183,
+      "tma_max": 29.131,
       "inflow_min": 0.0,
-      "inflow_max": 0.395,
-      "format": "10 Harian"
+      "inflow_max": 0.542,
+      "format": "15 Harian"
     },
     "BD062": {
-      "tma_min": 52.652,
-      "tma_max": 63.61,
+      "tma_min": 52.655,
+      "tma_max": 63.597,
       "inflow_min": 0.0,
-      "inflow_max": 0.369,
-      "format": "10 Harian"
+      "inflow_max": 0.375,
+      "format": "15 Harian"
     },
     "BD063": {
       "tma_min": 37.8,
-      "tma_max": 40.904,
+      "tma_max": 40.89,
       "inflow_min": 0.0,
-      "inflow_max": 0.239,
-      "format": "10 Harian"
+      "inflow_max": 0.257,
+      "format": "15 Harian"
     },
     "BD064": {
       "tma_min": 102.98,
@@ -470,25 +470,25 @@
       "format": "15 Harian"
     },
     "BD069": {
-      "tma_min": 54.298,
-      "tma_max": 59.599,
+      "tma_min": 54.291,
+      "tma_max": 59.585,
       "inflow_min": 0.0,
-      "inflow_max": 0.534,
-      "format": "10 Harian"
+      "inflow_max": 0.628,
+      "format": "15 Harian"
     },
     "BD070": {
-      "tma_min": 118.887,
-      "tma_max": 120.17,
-      "inflow_min": 0.016,
-      "inflow_max": 7.667,
-      "format": "10 Harian"
+      "tma_min": 118.931,
+      "tma_max": 120.112,
+      "inflow_min": 0.034,
+      "inflow_max": 10.929,
+      "format": "15 Harian"
     },
     "BD071": {
       "tma_min": 29.01,
-      "tma_max": 35.567,
+      "tma_max": 35.511,
       "inflow_min": 0.0,
-      "inflow_max": 1.151,
-      "format": "10 Harian"
+      "inflow_max": 1.703,
+      "format": "15 Harian"
     },
     "BD072": {
       "tma_min": 55.48,
@@ -821,10 +821,10 @@
     },
     "BD119": {
       "tma_min": 48.05,
-      "tma_max": 56.196,
+      "tma_max": 56.203,
       "inflow_min": 0.0,
-      "inflow_max": 129.942,
-      "format": "10 Harian"
+      "inflow_max": 233.588,
+      "format": "15 Harian"
     },
     "BD120": {
       "tma_min": 27.2,
@@ -1483,7 +1483,7 @@
     "10 Harian": 15
   },
   "val_mae": {
-    "15 Harian": 0.058533456176519394,
-    "10 Harian": 0.0690106600522995
+    "15 Harian": 0.0632534921169281,
+    "10 Harian": 0.07362482696771622
   }
 }
