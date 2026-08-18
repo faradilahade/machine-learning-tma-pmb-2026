@@ -660,8 +660,7 @@ if menu == "🏜️ Siaga Kekeringan":
                 text=per_bulan[s], textposition="inside"))
         fig_b.update_layout(
             barmode="stack", height=380, plot_bgcolor="white",
-            title=dict(text="Jumlah bendungan per status per bulan "
-                            "(periode terburuk dalam bulan)",
+            title=dict(text="Jumlah bendungan per status per bulan",
                        font=dict(size=14, color=WARNA["navy"])),
             yaxis_title="Jumlah bendungan", legend=dict(orientation="h", y=-0.18))
         fig_b.update_yaxes(showgrid=True, gridcolor="#EEE")
@@ -708,20 +707,34 @@ if menu == "🏜️ Siaga Kekeringan":
                                right_index=True, how="left")
         for b in (8, 9, 10):
             urutan[b] = (urutan[b].eq(True) if b in urutan.columns else False)
-        kritis_bdg = (urutan[urutan["bulan_kritis"] > 0]
-                      .sort_values([8, 9, 10, "skor_prioritas"],
-                                   ascending=False).head(30))
-        if kritis_bdg.empty:
-            st.success("✅ Tidak ada bendungan di bawah BON B pada cakupan filter ini.")
+        urutan_prio = urutan.sort_values([8, 9, 10, "skor_prioritas"],
+                                         ascending=False)
+        kritis_bdg = urutan_prio[urutan_prio["bulan_kritis"] > 0].head(30)
+        # pilihan bendungan yang ditampilkan; bawaan = 30 prioritas teratas
+        peta_nama_hm = urutan_prio.set_index("kode_bendungan")["nama_bendungan"]
+        pilih_hm = st.multiselect(
+            "Bendungan yang ditampilkan",
+            list(urutan_prio["kode_bendungan"]),
+            default=list(kritis_bdg["kode_bendungan"]),
+            format_func=lambda k: f"{peta_nama_hm.get(k, k)} ({k})",
+            key="pilih_status_pantau")
+        tampil_hm = urutan_prio[urutan_prio["kode_bendungan"].isin(pilih_hm)]
+        if tampil_hm.empty:
+            if kritis_bdg.empty:
+                st.success("✅ Tidak ada bendungan di bawah BON B pada "
+                           "cakupan filter ini.")
+            else:
+                st.info("Pilih minimal satu bendungan untuk menampilkan "
+                        "status pemantauan.")
         else:
             bobot = {NORMAL: 0, TANPA_BON: 0, WASPADA: 1, KRITIS: 2}
-            piv = (sbm[sbm["kode_bendungan"].isin(kritis_bdg["kode_bendungan"])]
+            piv = (sbm[sbm["kode_bendungan"].isin(tampil_hm["kode_bendungan"])]
                    .assign(b=lambda d: d["status_bon"].map(bobot))
                    .pivot_table(index="nama_bendungan", columns="bulan",
                                 values="b", aggfunc="max"))
             # baris mengikuti urutan prioritas; dibalik karena sumbu-y plotly
             # menggambar kategori dari bawah -> prioritas #1 tampil paling atas
-            piv = piv.reindex(kritis_bdg["nama_bendungan"]).iloc[::-1]
+            piv = piv.reindex(tampil_hm["nama_bendungan"]).iloc[::-1]
             # Series.map per kolom (DataFrame.replace int->str memicu
             # IndexError copy-on-write pada pandas >= 2.3)
             peta_label = {0: "Di atas BON A", 1: "Di antara BON A-B",
@@ -737,12 +750,14 @@ if menu == "🏜️ Siaga Kekeringan":
                 customdata=label_sel))
             fig_h.update_layout(
                 height=max(380, 16 * len(piv) + 130), plot_bgcolor="white",
-                title=dict(text=f"Kalender kritis {len(piv)} bendungan prioritas — "
-                                f"urut di bawah BON B Agu → Sep → Okt "
-                                f"(merah = di bawah BON B)",
+                title=dict(text="Status bendungan dalam pemantauan PMB "
+                                "dari bulan Agustus – Desember 2026",
                            font=dict(size=14, color=WARNA["navy"])),
                 yaxis=dict(tickfont=dict(size=9)))
             st.plotly_chart(fig_h, use_container_width=True)
+            st.caption("🟩 di atas BON A · 🟧 di antara BON A–B · "
+                       "🟥 di bawah BON B — urut prioritas: di bawah BON B "
+                       "Agustus → September → Oktober.")
 
     # -- pilih bendungan dalam pemantauan + carousel kartu
     st.markdown("#### 📡 Pilih bendungan dalam pemantauan")
