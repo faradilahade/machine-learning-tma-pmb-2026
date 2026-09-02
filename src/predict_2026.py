@@ -1,7 +1,15 @@
-"""Prediksi TMA Agustus-Desember 2026 per PERIODE (10/15-harian per bendungan).
+"""Prediksi TMA BERGULIR per PERIODE (10/15-harian per bendungan).
 
-Input model : 1 tahun periode terakhir (Agu 2025 - Jul 2026)
-Output      : periode Agustus-Desember 2026 (10 atau 15 langkah sesuai format)
+Cutoff      : periode LENGKAP terakhir pada data (periode ekor yang belum
+              selesai dibuang) — tiap run di awal bulan otomatis memakai
+              realisasi s.d. bulan sebelumnya.
+Input model : 1 tahun periode terakhir sebelum cutoff
+Output      : 10/15 periode SETELAH cutoff (≈5 bulan: bulan berjalan +
+              bulan-bulan berikutnya). Periode yang melewati Desember tahun
+              berjalan dipangkas (dashboard menampilkan satu tahun kalender);
+              baris lengkap tetap terarsip di riwayat_prediksi.parquet.
+Arsip       : sebelum menimpa hasil lama, prediksi run sebelumnya diarsipkan
+              (src/akurasi.py) untuk dievaluasi terhadap realisasi baru.
 
 Status per periode terhadap BON (kategori utama rekapitulasi):
   "Di atas BON A"            : TMA >= BON A
@@ -26,7 +34,8 @@ import matplotlib.pyplot as plt
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.utils import (load_config, path_root, baca_daftar_bendungan, baca_bon,
                        baca_rtow, baca_sifat_musim, skor_musim_untuk,
-                       daftar_periode, awal_periode, PERIODE_PER_BULAN,
+                       daftar_periode, awal_periode, akhir_periode,
+                       periode_berikutnya, label_periode, PERIODE_PER_BULAN,
                        FORMAT_15, FORMAT_10)
 from src.train_lstm import FITUR, NAMA_FILE, OUTPUT_PERIODE
 
@@ -85,7 +94,7 @@ def plot_sandingan(kode, nama, fmt, g26, out_png):
     ax.plot([urut.index(p) for p in real.index], real["tma"], color=WARNA["hijau"],
             lw=2.5, marker="o", ms=4, label="TMA Realisasi 2026")
     ax.plot([urut.index(p) for p in pred.index], pred["tma"], color=WARNA["merah"],
-            lw=2.5, ls="--", marker="s", ms=4, label="TMA Prediksi (Agu-Des)")
+            lw=2.5, ls="--", marker="s", ms=4, label="TMA Prediksi")
     ax.set_xticks(x)
     ax.set_xticklabels(urut, rotation=90, fontsize=7)
     ax.set_ylabel("TMA (mdpl)")
@@ -110,6 +119,13 @@ def main():
 
     df = pd.read_parquet(path_root("data", "processed",
                                    "gabungan_periode.parquet"))
+    # cutoff global = tanggal data harian terakhir; periode yang belum
+    # lengkap (akhirnya melewati cutoff) tidak dipakai sebagai input
+    harian = pd.read_parquet(path_root("data", "processed",
+                                       "tma_harian_qc.parquet"))
+    tgl_data = harian["tanggal"].max()
+    print(f"Data harian terakhir: {tgl_data.date()} — prediksi bergulir "
+          f"dimulai dari periode pertama setelah periode lengkap terakhir")
     dir_model = path_root(cfg["output"]["dir_model"])
     with open(os.path.join(dir_model, "skala_periode.json")) as f:
         meta = json.load(f)
@@ -134,7 +150,15 @@ def main():
         fmt = s["format"]
         n_in = 12 * PERIODE_PER_BULAN[fmt] * m.get("input_tahun", 1)
         n_out = OUTPUT_PERIODE[fmt]
-        g = df[df["kode_bendungan"] == kode]
+        g = df[df["kode_bendungan"] == kode].sort_values("tanggal")
+        # buang periode ekor yang belum lengkap datanya
+        akhir = pd.Series(
+            [akhir_periode(t.year, t.month, int(p[3:]), fmt)
+             for t, p in zip(g["tanggal"], g["periode"])], index=g.index)
+        g = g[akhir <= tgl_data]
+        if g.empty:
+            print(f"LEWATI {kode}: tidak ada periode lengkap")
+            continue
         try:
             pred = prediksi_per_bendungan(model[fmt], g, s, peta_musim,
                                           kode, n_in, n_out)
@@ -142,15 +166,19 @@ def main():
             print(f"LEWATI {kode}: {e}")
             continue
 
-        g26 = g[(g["tanggal"] >= "2026-01-01")
-                & (g["tanggal"] <= "2026-07-31")].sort_values("tanggal")
-        for t, p, v in zip(g26["tanggal"], g26["periode"], g26["tma"]):
+        # horizon bergulir: n_out periode setelah periode lengkap terakhir
+        t_akhir = g["tanggal"].iloc[-1]
+        target = periode_berikutnya(t_akhir.year, t_akhir.month,
+                                    int(g["periode"].iloc[-1][3:]), fmt, n_out)
+        tahun_pred = target[0][0]
+        g_thn = g[g["tanggal"] >= pd.Timestamp(tahun_pred, 1, 1)]
+        for t, p, v in zip(g_thn["tanggal"], g_thn["periode"], g_thn["tma"]):
             rows.append([kode, nama, fmt, t, p, round(float(v), 3), "realisasi"])
-        lbl_pred = daftar_periode(fmt, 8, 12)
-        for lbl, v in zip(lbl_pred, pred):
-            b, i = int(lbl[:2]), int(lbl[3:])
-            rows.append([kode, nama, fmt, awal_periode(2026, b, i, fmt),
-                         lbl, round(float(v), 3), "prediksi"])
+        for (t, b, i), v in zip(target, pred):
+            if t != tahun_pred:   # pangkas lintas tahun: dashboard 1 tahun
+                continue
+            rows.append([kode, nama, fmt, awal_periode(t, b, i, fmt),
+                         label_periode(b, i), round(float(v), 3), "prediksi"])
         print(f"OK  {kode} {nama} [{fmt}]: "
               f"{np.round(pred[:4], 2).tolist()} ... ({n_out} periode)")
 
@@ -177,8 +205,12 @@ def main():
                        os.path.join(dir_graf, f"sandingan_{kode}.png"))
         n_png += 1
 
-    hasil.to_parquet(os.path.join(dir_pred, "prediksi_tma_2026.parquet"),
-                     index=False)
+    # arsipkan prediksi run SEBELUMNYA sebelum ditimpa (untuk evaluasi
+    # akurasi terhadap realisasi yang baru masuk — lihat src/akurasi.py)
+    from src.akurasi import arsipkan_file
+    fp_pred = os.path.join(dir_pred, "prediksi_tma_2026.parquet")
+    arsipkan_file(fp_pred)
+    hasil.to_parquet(fp_pred, index=False)
     hasil.to_excel(os.path.join(dir_pred, "prediksi_tma_2026.xlsx"), index=False)
     print(f"\nOK  prediksi_tma_2026.parquet ({len(hasil):,} baris, "
           f"{hasil['kode_bendungan'].nunique()} bendungan, skala periode)")

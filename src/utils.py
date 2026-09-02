@@ -50,6 +50,37 @@ def daftar_periode(fmt: str, bulan_awal: int = 1, bulan_akhir: int = 12) -> list
             for i in range(1, n + 1)]
 
 
+def akhir_periode(tahun: int, bulan: int, idx: int, fmt: str) -> pd.Timestamp:
+    """Tanggal TERAKHIR sebuah periode (periode terakhir bulan = akhir bulan).
+
+    Dipakai menentukan periode yang sudah LENGKAP datanya: periode dianggap
+    lengkap bila akhir_periode <= tanggal data harian terakhir.
+    """
+    n = PERIODE_PER_BULAN.get(fmt, 2)
+    if int(idx) < n:
+        return awal_periode(tahun, bulan, int(idx) + 1, fmt) - pd.Timedelta(days=1)
+    return pd.Timestamp(int(tahun), int(bulan), 1) + pd.offsets.MonthEnd(1)
+
+
+def periode_berikutnya(tahun: int, bulan: int, idx: int, fmt: str,
+                       n: int) -> list:
+    """n periode kalender SETELAH (tahun, bulan, idx) -> [(tahun, bulan, idx)].
+
+    Melewati batas tahun (12-02 15H -> 01-01 tahun berikutnya) sehingga
+    horizon prediksi dapat bergulir bulanan tanpa terikat Agu-Des.
+    """
+    per_bln = PERIODE_PER_BULAN.get(fmt, 2)
+    hasil, t, b, i = [], int(tahun), int(bulan), int(idx)
+    for _ in range(n):
+        i += 1
+        if i > per_bln:
+            i, b = 1, b + 1
+            if b > 12:
+                b, t = 1, t + 1
+        hasil.append((t, b, i))
+    return hasil
+
+
 def agregasi_periode(df: pd.DataFrame, fmt: str, kolom_nilai: str,
                      cara: str = "mean") -> pd.DataFrame:
     """Agregasi deret harian 1 bendungan -> per periode sesuai format.
@@ -161,7 +192,15 @@ def load_config(path: str = None) -> dict:
         if not os.path.exists(path):
             path = os.path.join(ROOT, "config.cloud.yaml")
     with open(path, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+        cfg = yaml.safe_load(f)
+    # periode.akhir "auto" / kosong -> H-1 saat run (prediksi bergulir:
+    # tiap run di awal bulan otomatis menarik realisasi s.d. kemarin)
+    akhir = str(cfg.get("periode", {}).get("akhir", "") or "").strip().lower()
+    if akhir in ("", "auto", "none", "null"):
+        cfg.setdefault("periode", {})["akhir"] = (
+            pd.Timestamp.now().normalize() - pd.Timedelta(days=1)
+        ).strftime("%Y-%m-%d")
+    return cfg
 
 
 def path_root(*parts) -> str:

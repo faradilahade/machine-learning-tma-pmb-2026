@@ -1,13 +1,16 @@
-"""Dashboard Streamlit — Prediksi TMA Bulanan Agustus-Desember 2026 (LSTM).
+"""Dashboard Streamlit — Prediksi TMA per Periode BERGULIR bulanan (LSTM).
 
 Jalankan:  streamlit run app.py
 Prasyarat: pipeline sudah dijalankan (python run_pipeline.py) sehingga
-           output/prediksi/prediksi_tma_2026.parquet tersedia.
+           output/prediksi/prediksi_tma_2026.parquet tersedia. Tiap run di
+           awal bulan memprediksi bulan berjalan + bulan berikutnya, dan
+           prediksi run sebelumnya otomatis dievaluasi terhadap realisasi.
 
 Menu:
   🏜️ Siaga Kekeringan        - ringkasan visual nasional + akurasi & metode
   📈 Detail Bendungan        - grafik sandingan + kecukupan air + unduh per bendungan
-  🚨 Pemantauan Agustus 2026 - tabel pemantauan bulan fokus untuk semua bendungan
+  🚨 Pemantauan Bulanan      - tabel pemantauan bulan fokus untuk semua bendungan
+  🎯 Akurasi Model           - prediksi run terdahulu vs realisasi per bendungan
   🗂️ Rekap & Di bawah BON B  - rekap nasional, per balai, daftar kritis
   🧩 Data Belum Cocok        - bendungan yang datanya belum terhubung antar sumber
   ⬇️ Unduh Laporan           - Excel + ZIP grafik JPG (semua / hanya di bawah BON B)
@@ -27,6 +30,7 @@ from src.utils import (load_config, path_root, baca_daftar_bendungan,
                        baca_neraca_air, baca_sifat_musim, daftar_periode)
 import src.laporan as lap
 import src.kecukupan as kc
+import src.akurasi as akr
 from src.laporan import KRITIS, WASPADA, NORMAL, TANPA_BON, BULAN_ID, WARNA
 from src.evaluasi import METODE_INFO, METODE_LSTM, ringkas as ringkas_evaluasi
 
@@ -38,7 +42,9 @@ WARNA_STATUS = {KRITIS: "#F8CBCB", WASPADA: "#FFEB9C",
                 NORMAL: "#C6EFCE", TANPA_BON: "#E4E4E4",
                 "Defisit": "#F8CBCB", "Surplus": "#C6EFCE",
                 "Cukup": "#C6EFCE", "Belum cukup": "#F8CBCB",
-                "Tanpa Data": "#E4E4E4"}
+                "Tanpa Data": "#E4E4E4",
+                akr.SESUAI: "#C6EFCE", akr.SEBAGIAN: "#FFEB9C",
+                akr.BELUM: "#F8CBCB"}
 # isi tegas untuk mark grafik (selalu berpasangan dengan label + angka)
 WARNA_GRAFIK = {KRITIS: "#C62828", WASPADA: "#D98E04",
                 NORMAL: "#2E7D32", TANPA_BON: "#9E9E9E",
@@ -82,8 +88,13 @@ def muat_data():
     if not kek.empty:
         kek = kek.merge(kunci, on="id_db", how="inner")
     kurva_sc = kc.baca_storage_curve()
+    # akurasi run terdahulu vs realisasi (src/akurasi.py) + arsip prediksi
+    fp_ak = path_root(cfg["output"]["dir_prediksi"], "akurasi_realisasi.parquet")
+    akurasi = pd.read_parquet(fp_ak) if os.path.exists(fp_ak) else pd.DataFrame()
+    fp_rw = path_root(cfg["output"]["dir_prediksi"], "riwayat_prediksi.parquet")
+    riwayat = pd.read_parquet(fp_rw) if os.path.exists(fp_rw) else pd.DataFrame()
     return (df, hist, daftar, rekap_qc, neraca, evaluasi, sifat_musim,
-            rtow_p, kek, kurva_sc)
+            rtow_p, kek, kurva_sc, akurasi, riwayat)
 
 
 @st.cache_data(show_spinner="Menyusun berkas Excel…")
@@ -126,14 +137,22 @@ def warnai_status(d: pd.DataFrame, kolom: str):
 
 
 (df, hist, daftar, rekap_qc, neraca, evaluasi, sifat_musim,
- rtow_p, kek, kurva_sc) = muat_data()
+ rtow_p, kek, kurva_sc, akurasi, riwayat) = muat_data()
+
+# rentang bulan prediksi berjalan (bergulir tiap run pipeline)
+_pred_bln = sorted(df[df["jenis"] == "prediksi"]["tanggal"].dt.month.unique())
+TAHUN_PRED = int(df[df["jenis"] == "prediksi"]["tanggal"].dt.year.max()) \
+    if _pred_bln else 2026
+BULAN_PRED_AWAL = _pred_bln[0] if _pred_bln else 8
+RENTANG_PRED = (f"{BULAN_ID[_pred_bln[0]]}–{BULAN_ID[_pred_bln[-1]]} "
+                f"{TAHUN_PRED}" if _pred_bln else "—")
 
 # ------------------------------------------------------------------ header
 st.markdown(
     f"<h2 style='color:{WARNA['navy']};margin-bottom:0'>🌊 Dams Drought Early "
     f"Warning and Operational Mitigation System (DDEWOMS)</h2>"
     f"<p style='color:{WARNA['biru']};margin-top:2px'>Pusat Monitoring Bendungan — LSTM per periode "
-    f"10/15-harian (format RTOW) + sifat musim · prediksi Agustus–Desember 2026 · "
+    f"10/15-harian (format RTOW) + sifat musim · prediksi bergulir {RENTANG_PRED} · "
     f"sandingan Bon A / Bon B / RTOW · kecukupan air RTOW periodik</p>",
     unsafe_allow_html=True)
 
@@ -141,8 +160,9 @@ st.markdown(
 st.sidebar.header("Menu")
 menu = st.sidebar.radio(
     "Pilih halaman",
-    ["🏜️ Siaga Kekeringan", "📈 Detail Bendungan", "🚨 Pemantauan Agustus 2026",
-     "🗂️ Rekap & Di bawah BON B", "🧩 Data Belum Cocok", "⬇️ Unduh Laporan"],
+    ["🏜️ Siaga Kekeringan", "📈 Detail Bendungan", "🚨 Pemantauan Bulanan",
+     "🎯 Akurasi Model", "🗂️ Rekap & Di bawah BON B", "🧩 Data Belum Cocok",
+     "⬇️ Unduh Laporan"],
     label_visibility="collapsed")
 
 st.sidebar.header("Filter Wilayah")
@@ -308,7 +328,7 @@ def fig_sandingan(g: pd.DataFrame, tampil_hist: bool = False):
         fig.add_trace(go.Scatter(x=x_pred, y=y_pred, mode="lines+markers",
                                  line=dict(color=WARNA["merah"], width=3, dash="dash"),
                                  marker=dict(size=7, symbol="square"),
-                                 name="TMA Prediksi LSTM (Agu–Des 2026)"))
+                                 name=f"TMA Prediksi LSTM ({RENTANG_PRED})"))
         krit = pred[pred["status_bon"] == KRITIS]
         if not krit.empty:
             fig.add_trace(go.Scatter(
@@ -574,7 +594,7 @@ def kartu_bendungan(kode: str):
 
 # ============================================================ 0. SIAGA KEKERINGAN
 if menu == "🏜️ Siaga Kekeringan":
-    st.subheader("🏜️ Dashboard Siaga Kekeringan — Musim Kering Agustus–Desember 2026")
+    st.subheader(f"🏜️ Dashboard Siaga Kekeringan — Prediksi {RENTANG_PRED}")
 
     # -- agregat per bendungan: status BON terburuk PER BULAN (worst periode
     #    dalam bulan) agar bendungan format 10-harian & 15-harian sebanding
@@ -640,7 +660,7 @@ if menu == "🏜️ Siaga Kekeringan":
             texttemplate="%{label}<br>%{value} (%{percent})",
             textposition="outside"))
         fig_p.update_layout(
-            title=dict(text="Status terburuk prediksi Agu–Des 2026",
+            title=dict(text=f"Status terburuk prediksi {RENTANG_PRED}",
                        font=dict(size=14, color=WARNA["navy"])),
             height=380, showlegend=False,
             annotations=[dict(text=f"{len(per_bdg)}<br>bendungan",
@@ -697,17 +717,18 @@ if menu == "🏜️ Siaga Kekeringan":
         fig_bl.update_xaxes(showgrid=True, gridcolor="#EEE")
         st.plotly_chart(fig_bl, use_container_width=True)
     with c_kanan:
-        # 30 bendungan prioritas: yang di bawah BON B bulan Agustus dulu,
-        # lalu September, lalu Oktober; sesama kelompok diurut skor prioritas
-        kritis_agu_okt = (sbm[sbm["status_bon"] == KRITIS]
+        # 30 bendungan prioritas: yang di bawah BON B pada bulan prediksi
+        # pertama dulu, lalu 2 bulan berikutnya; sesama kelompok diurut skor
+        bln_prio = sorted(sbm["bulan"].unique())[:3]
+        kritis_per_bln = (sbm[sbm["status_bon"] == KRITIS]
                           .pivot_table(index="kode_bendungan", columns="bulan",
                                        values="status_bon", aggfunc="size")
                           .notna())
-        urutan = per_bdg.merge(kritis_agu_okt, left_on="kode_bendungan",
+        urutan = per_bdg.merge(kritis_per_bln, left_on="kode_bendungan",
                                right_index=True, how="left")
-        for b in (8, 9, 10):
+        for b in bln_prio:
             urutan[b] = (urutan[b].eq(True) if b in urutan.columns else False)
-        urutan_prio = urutan.sort_values([8, 9, 10, "skor_prioritas"],
+        urutan_prio = urutan.sort_values(bln_prio + ["skor_prioritas"],
                                          ascending=False)
         kritis_bdg = urutan_prio[urutan_prio["bulan_kritis"] > 0].head(30)
         # pilihan bendungan yang ditampilkan; bawaan = 30 prioritas teratas
@@ -750,31 +771,32 @@ if menu == "🏜️ Siaga Kekeringan":
                 customdata=label_sel))
             fig_h.update_layout(
                 height=max(380, 16 * len(piv) + 130), plot_bgcolor="white",
-                title=dict(text="Status bendungan dalam pemantauan PMB "
-                                "dari bulan Agustus – Desember 2026",
+                title=dict(text=f"Status bendungan dalam pemantauan PMB "
+                                f"dari bulan {RENTANG_PRED}",
                            font=dict(size=14, color=WARNA["navy"])),
                 yaxis=dict(tickfont=dict(size=9)))
             st.plotly_chart(fig_h, use_container_width=True)
             st.caption("🟩 di atas BON A · 🟧 di antara BON A–B · "
                        "🟥 di bawah BON B — urut prioritas: di bawah BON B "
-                       "Agustus → September → Oktober.")
+                       + " → ".join(BULAN_ID[b] for b in bln_prio) + ".")
 
     # -- pilih bendungan dalam pemantauan + carousel kartu
     st.markdown("#### 📡 Pilih bendungan dalam pemantauan")
-    st.caption("Bawaan: seluruh bendungan **kritis di bawah BON B pada "
-               "Agustus 2026**. Hanya bendungan terpilih yang ditampilkan "
-               "sebagai kartu pemantauan di bawah — kartu bergeser otomatis "
-               "dan dapat dijeda / dinavigasi manual.")
+    st.caption(f"Bawaan: seluruh bendungan **kritis di bawah BON B pada "
+               f"{BULAN_ID[BULAN_PRED_AWAL]} {TAHUN_PRED}** (bulan prediksi "
+               f"pertama / bulan berjalan). Hanya bendungan terpilih yang "
+               f"ditampilkan sebagai kartu pemantauan di bawah — kartu "
+               f"bergeser otomatis dan dapat dijeda / dinavigasi manual.")
     daf_pantau = (dff[["kode_bendungan", "nama_bendungan", "nama_balai"]]
                   .drop_duplicates("kode_bendungan")
                   .sort_values("nama_bendungan"))
     peta_pantau = daf_pantau.set_index("kode_bendungan")
     opsi_pantau = list(daf_pantau["kode_bendungan"])
-    kode_kritis_agu = sorted(
-        sbm[(sbm["bulan"] == 8) & (sbm["status_bon"] == KRITIS)]
+    kode_kritis_awal = sorted(
+        sbm[(sbm["bulan"] == BULAN_PRED_AWAL) & (sbm["status_bon"] == KRITIS)]
         ["kode_bendungan"].unique())
     bawaan = [k for k in st.session_state.get(
-        "pantau_simpan", kode_kritis_agu or kode_kritis[:3] or opsi_pantau[:1])
+        "pantau_simpan", kode_kritis_awal or kode_kritis[:3] or opsi_pantau[:1])
         if k in opsi_pantau]
     pilih_pantau = st.multiselect(
         "Bendungan dalam pemantauan", opsi_pantau, default=bawaan,
@@ -1172,15 +1194,16 @@ elif menu == "📈 Detail Bendungan":
 
 
 # ============================================================ 2. AGUSTUS
-elif menu == "🚨 Pemantauan Agustus 2026":
+elif menu == "🚨 Pemantauan Bulanan":
     bulan_tersedia = sorted(pred_dff["tanggal"].dt.month.unique())
     c_b, c_n = st.columns([1, 1])
+    # bawaan = bulan prediksi pertama (bulan berjalan run pipeline terakhir)
     bulan = c_b.selectbox("Bulan prediksi yang dipantau", bulan_tersedia,
-                          index=bulan_tersedia.index(8) if 8 in bulan_tersedia else 0,
-                          format_func=lambda m: f"{BULAN_ID[m]} 2026")
+                          index=0,
+                          format_func=lambda m: f"{BULAN_ID[m]} {TAHUN_PRED}")
     n_peringkat = c_n.slider("Jumlah bendungan pada grafik peringkat", 5, 50, 25, 5)
 
-    st.subheader(f"Pemantauan Bendungan — {BULAN_ID[bulan]} 2026")
+    st.subheader(f"Pemantauan Bendungan — {BULAN_ID[bulan]} {TAHUN_PRED}")
     tab = lap.tabel_pemantauan_bulan(dff, bulan)
     if tab.empty:
         st.warning(f"Tidak ada data prediksi {BULAN_ID[bulan]} pada filter ini.")
@@ -1259,9 +1282,177 @@ elif menu == "🚨 Pemantauan Agustus 2026":
         disabled=not len(kode_kritis), width="stretch")
 
 
+# ============================================================ 2b. AKURASI MODEL
+elif menu == "🎯 Akurasi Model":
+    st.subheader("🎯 Akurasi Model — Prediksi Run Terdahulu vs Realisasi")
+    st.caption(
+        "Setiap run pipeline (awal bulan) mengarsipkan prediksinya. Begitu "
+        "realisasi bulan tersebut masuk pada run berikutnya, prediksi lama "
+        "otomatis disandingkan dengan realisasi per periode per bendungan. "
+        "**Run** = bulan cutoff data saat prediksi dibuat — mis. run "
+        "*2026-07* adalah prediksi berbekal data s.d. Juli 2026 (horizon "
+        "Agu–Des). **Status sesuai** = kategori BON hasil prediksi sama "
+        "dengan kategori BON realisasi pada periode tersebut.")
+    if akurasi.empty:
+        st.info("Belum ada periode prediksi yang terealisasi. Riwayat akurasi "
+                "terisi otomatis mulai run pipeline bulan berikutnya "
+                "(prediksi bulan ini dibandingkan dengan realisasinya).")
+        st.stop()
+    ak = akurasi[akurasi["kode_bendungan"]
+                 .isin(dff["kode_bendungan"].unique())].copy()
+    if ak.empty:
+        st.warning("Tidak ada data akurasi pada cakupan filter ini.")
+        st.stop()
+
+    # -- pilihan run + KPI
+    run_opsi = sorted(ak["run_id"].unique(), reverse=True)
+    pilih_run = st.selectbox(
+        "Run prediksi yang dievaluasi", ["Semua run"] + run_opsi, index=1,
+        format_func=lambda r: (r if r == "Semua run" else
+                               f"Run {r} (prediksi berbekal data s.d. "
+                               f"{BULAN_ID[int(r[5:])]} {r[:4]})"))
+    akf = ak if pilih_run == "Semua run" else ak[ak["run_id"] == pilih_run]
+    rkf = akr.rekap_per_bendungan(akf)
+    m1, m2, m3, m4, m5 = st.columns(5)
+    m1.metric("Run dievaluasi", akf["run_id"].nunique())
+    m2.metric("Periode dievaluasi", f"{len(akf):,}")
+    m3.metric("Bendungan", akf["kode_bendungan"].nunique())
+    m4.metric("MAE", f"{akf['abs_error_m'].mean():.2f} m")
+    m5.metric("Status BON sesuai", f"{akf['status_sesuai'].mean()*100:.1f}%")
+
+    # -- baris 1: tren antar-run + komposisi kesesuaian
+    c_kiri, c_kanan = st.columns([3, 2])
+    with c_kiri:
+        rr = akr.rekap_per_run(ak)
+        fig_r = go.Figure()
+        fig_r.add_trace(go.Bar(
+            x=rr["run_id"], y=rr["mae_m"], name="MAE (m)",
+            marker_color=WARNA["biru"],
+            text=rr["mae_m"].round(2), textposition="outside"))
+        fig_r.add_trace(go.Scatter(
+            x=rr["run_id"], y=rr["pct_status_sesuai"], yaxis="y2",
+            name="Status BON sesuai (%)", mode="lines+markers+text",
+            text=rr["pct_status_sesuai"].round(0).astype(int).astype(str) + "%",
+            textposition="top center", line=dict(color=WARNA_GRAFIK[NORMAL])))
+        fig_r.update_layout(
+            height=380, plot_bgcolor="white",
+            title=dict(text="Tren akurasi antar-run (evaluasi model dari "
+                            "waktu ke waktu)",
+                       font=dict(size=14, color=WARNA["navy"])),
+            yaxis=dict(title="MAE (m)", showgrid=True, gridcolor="#EEE"),
+            yaxis2=dict(title="Sesuai (%)", overlaying="y", side="right",
+                        range=[0, 105], showgrid=False),
+            legend=dict(orientation="h", y=-0.2))
+        st.plotly_chart(fig_r, use_container_width=True)
+    with c_kanan:
+        cnt_k = (rkf["kesesuaian"].value_counts()
+                 .reindex([akr.SESUAI, akr.SEBAGIAN, akr.BELUM]).dropna()
+                 .astype(int))
+        fig_k = go.Figure(go.Pie(
+            labels=cnt_k.index, values=cnt_k.values, hole=0.55, sort=False,
+            marker=dict(colors=[WARNA_STATUS[s] for s in cnt_k.index],
+                        line=dict(color="white", width=2)),
+            texttemplate="%{label}<br>%{value} (%{percent})",
+            textposition="outside"))
+        fig_k.update_layout(
+            height=380, showlegend=False,
+            title=dict(text="Kesesuaian status BON per bendungan",
+                       font=dict(size=14, color=WARNA["navy"])),
+            annotations=[dict(text=f"{len(rkf)}<br>bendungan-run",
+                              x=0.5, y=0.5, showarrow=False,
+                              font=dict(size=14))])
+        st.plotly_chart(fig_k, use_container_width=True)
+
+    # -- tabel akurasi per bendungan (yang belum sesuai di atas)
+    st.markdown("#### 📋 Akurasi per bendungan")
+    filter_sesuai = st.multiselect(
+        "Tampilkan kesesuaian", [akr.BELUM, akr.SEBAGIAN, akr.SESUAI],
+        default=[akr.BELUM, akr.SEBAGIAN, akr.SESUAI])
+    tampil_rk = rkf[rkf["kesesuaian"].isin(filter_sesuai)].merge(
+        daftar[["kode_bendungan", "nama_balai"]].drop_duplicates(
+            "kode_bendungan"), on="kode_bendungan", how="left")
+    tampil_rk = tampil_rk[["run_id", "kode_bendungan", "nama_bendungan",
+                           "nama_balai", "n_periode", "n_status_sesuai",
+                           "pct_status_sesuai", "mae_m", "bias_m",
+                           "kesesuaian"]]
+    st.dataframe(warnai_status(tampil_rk, "kesesuaian"),
+                 use_container_width=True, height=420, hide_index=True)
+    st.caption("`mae_m` = rerata selisih mutlak prediksi–realisasi (meter); "
+               "`bias_m` positif = prediksi cenderung terlalu TINGGI; "
+               "`pct_status_sesuai` = % periode dengan kategori BON prediksi "
+               "sama dengan realisasi. Urut dari yang paling belum sesuai.")
+
+    # -- 20 MAE terbesar
+    mae20 = (rkf.groupby(["kode_bendungan", "nama_bendungan"])["mae_m"]
+             .mean().nlargest(20).sort_values())
+    fig_m = go.Figure(go.Bar(
+        y=[f"{n} ({k})" for k, n in mae20.index], x=mae20.values,
+        orientation="h", marker_color=WARNA_GRAFIK[KRITIS],
+        text=mae20.round(2), textposition="outside"))
+    fig_m.update_layout(
+        height=max(380, 22 * len(mae20) + 120), plot_bgcolor="white",
+        title=dict(text="20 bendungan dengan MAE terbesar — prioritas "
+                        "evaluasi kekurangan model",
+                   font=dict(size=14, color=WARNA["navy"])),
+        xaxis=dict(title="MAE (m)", showgrid=True, gridcolor="#EEE"),
+        yaxis=dict(tickfont=dict(size=10)))
+    st.plotly_chart(fig_m, use_container_width=True)
+
+    # -- detail satu bendungan: prediksi tiap run vs realisasi
+    st.markdown("#### 🔍 Detail per bendungan")
+    opsi_ak = sorted(ak["kode_bendungan"].unique())
+    peta_nama_ak = (ak.drop_duplicates("kode_bendungan")
+                    .set_index("kode_bendungan")["nama_bendungan"])
+    pilih_ak = st.selectbox(
+        "Bendungan", opsi_ak,
+        format_func=lambda k: f"{peta_nama_ak.get(k, k)} ({k})")
+    d_ak = ak[ak["kode_bendungan"] == pilih_ak].sort_values(
+        ["run_id", "tanggal"])
+    fig_d = go.Figure()
+    real_b = d_ak.drop_duplicates("periode").sort_values("tanggal")
+    fig_d.add_trace(go.Scatter(
+        x=real_b["periode"], y=real_b["tma_realisasi"], mode="lines+markers",
+        name="Realisasi", line=dict(color=WARNA_GRAFIK[NORMAL], width=3)))
+    for rid, g_run in d_ak.groupby("run_id"):
+        fig_d.add_trace(go.Scatter(
+            x=g_run["periode"], y=g_run["tma_prediksi"],
+            mode="lines+markers", name=f"Prediksi run {rid}",
+            line=dict(dash="dash")))
+    fig_d.update_layout(
+        height=380, plot_bgcolor="white",
+        title=dict(text=f"Prediksi tiap run vs realisasi — "
+                        f"{peta_nama_ak.get(pilih_ak, '')} ({pilih_ak})",
+                   font=dict(size=14, color=WARNA["navy"])),
+        yaxis=dict(title="TMA (mdpl)", showgrid=True, gridcolor="#EEE"),
+        legend=dict(orientation="h", y=-0.25))
+    st.plotly_chart(fig_d, use_container_width=True)
+    d_tampil = d_ak[["run_id", "periode", "tma_prediksi", "tma_realisasi",
+                     "error_m", "status_prediksi", "status_realisasi",
+                     "status_sesuai"]].copy()
+    d_tampil["status_sesuai"] = np.where(d_tampil["status_sesuai"],
+                                         "Sesuai", "Belum sesuai")
+    st.dataframe(warnai_status(d_tampil, "status_sesuai"),
+                 use_container_width=True, hide_index=True)
+
+    # -- unduh
+    buf_ak = io.BytesIO()
+    with pd.ExcelWriter(buf_ak) as xl:
+        akf.drop(columns=["status_sesuai"]).assign(
+            status_sesuai=np.where(akf["status_sesuai"], "Sesuai",
+                                   "Belum sesuai")).to_excel(
+            xl, sheet_name="Detail per Periode", index=False)
+        rkf.to_excel(xl, sheet_name="Rekap per Bendungan", index=False)
+        akr.rekap_per_run(ak).to_excel(xl, sheet_name="Rekap per Run",
+                                       index=False)
+    st.download_button(
+        "📊 Unduh Excel akurasi (detail + rekap)", buf_ak.getvalue(),
+        file_name=f"akurasi_model_{stamp()}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+
 # ============================================================ 3. REKAP
 elif menu == "🗂️ Rekap & Di bawah BON B":
-    st.subheader("Rekapitulasi Status BON — Agustus–Desember 2026")
+    st.subheader(f"Rekapitulasi Status BON — {RENTANG_PRED}")
     rekap = lap.rekap_bendungan(dff)
     n_atas = int((rekap["status_terburuk"] == NORMAL).sum())
     n_antara = int((rekap["status_terburuk"] == WASPADA).sum())

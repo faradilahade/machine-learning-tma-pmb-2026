@@ -63,7 +63,7 @@ bon:
 # Rentang data historis
 periode:
   awal:  "2018-01-01"
-  akhir: "2026-07-31"
+  akhir: "auto"
 
 # Parameter QC
 qc:

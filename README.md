@@ -49,16 +49,24 @@ Pusat Monitoring Bendungan · Subdit OP Bendungan dan Danau · Dit. Bina OP · D
                 · normalisasi min–max PER BENDUNGAN
                 · EarlyStopping + ReduceLROnPlateau, split temporal 80/20
 
-5. PREDIKSI     input 1 tahun periode terakhir (Agu 2025–Jul 2026)
-                → output periode Agustus–Desember 2026 (mdpl)
-                → status per periode: Di atas BON A / Di antara BON A-B /
-                  Di bawah BON B (+ selisih ke RTOW)
+5. PREDIKSI     BERGULIR BULANAN: cutoff = periode lengkap terakhir pada
+                data (periode ekor yang belum selesai dibuang), input 1 tahun
+                periode sebelum cutoff → output 10/15 periode berikutnya
+                (bulan berjalan + ±4 bulan ke depan, dipangkas s.d. Desember
+                tahun berjalan) → status per periode: Di atas BON A /
+                Di antara BON A-B / Di bawah BON B (+ selisih ke RTOW)
 
-6. EVALUASI     backtest 2 periode uji (Agu–Des 2025, Mar–Jul 2026):
+6. AKURASI      arsip prediksi tiap run (run_id = bulan cutoff, mis. 2026-08)
+                → riwayat_prediksi.parquet; periode arsip yang realisasinya
+                sudah masuk disandingkan otomatis: error (m) + kesesuaian
+                kategori BON per bendungan per periode
+                → akurasi_realisasi.parquet/.xlsx (menu 🎯 Akurasi Model)
+
+7. EVALUASI     backtest 2 periode uji (Agu–Des 2025, Mar–Jul 2026):
                 LSTM vs Persistensi vs Naif musiman vs Klimatologi
                 vs Tren linier → MAE/RMSE/bias/MAPE-rentang
 
-7. VISUALISASI  Streamlit + Plotly, sumbu-x label periode '01-01'…'12-03':
+8. VISUALISASI  Streamlit + Plotly, sumbu-x label periode '01-01'…'12-03':
                 🟢 hijau  = TMA realisasi (per periode)
                 🔴 merah  = TMA prediksi Agu–Des (putus-putus)
                 🟡 amber  = BON A   ·   🟠 coral = BON B
@@ -81,7 +89,8 @@ Pusat Monitoring Bendungan · Subdit OP Bendungan dan Danau · Dit. Bina OP · D
 |---|---|
 | 🏜️ Siaga Kekeringan | Dashboard pengambilan keputusan: KPI 3 kategori BON, donat distribusi status, batang bertumpuk status per bulan (periode terburuk) & per balai, defisit vs surplus air per bulan, kalender panas bendungan kritis, 15 defisit air terbesar, **daftar prioritas berskor**, **akurasi & perbandingan 5 metode**, **kesimpulan otomatis seluruh data**, dan **unduh laporan PDF** |
 | 📈 Detail Bendungan | Grafik sandingan interaktif per periode (realisasi, prediksi, BON A/B, RTOW, historis per tahun), metrik TMA, **Hasil Analisis** (narasi status BON + sifat musim + akurasi backtest bendungan tsb), **neraca air kebutuhan vs ketersediaan (surplus/defisit)**, unduh JPG + Excel |
-| 🚨 Pemantauan Agustus 2026 | Bulan pemantauan (default Agustus, dapat diganti Sep–Des): nilai dari **periode terburuk** dalam bulan, selisih ke BON A/B & RTOW, rekap per balai, grafik peringkat, unduh Excel |
+| 🚨 Pemantauan Bulanan | Bulan pemantauan (default bulan prediksi pertama = bulan berjalan): nilai dari **periode terburuk** dalam bulan, selisih ke BON A/B & RTOW, rekap per balai, grafik peringkat, unduh Excel |
+| 🎯 Akurasi Model | Prediksi run terdahulu vs realisasi per bendungan: KPI (MAE, % status BON sesuai), tren akurasi antar-run, tabel per bendungan (Sesuai / Sebagian / Belum sesuai), 20 MAE terbesar, detail prediksi tiap run vs realisasi per bendungan, unduh Excel — riwayat terakumulasi tiap run untuk evaluasi kekurangan model |
 | 🗂️ Rekap & Di bawah BON B | Rekapitulasi **3 kategori**: Di atas BON A / Di antara BON A–B / Di bawah BON B — tab per kategori + rincian periode yang menembus BON B + rekap per balai |
 | 🧩 Data Belum Cocok | Bendungan yang datanya belum terhubung antar sumber, per kategori masalah + tindak lanjut, unduh Excel |
 | ⬇️ Unduh Laporan | Excel lengkap, ZIP grafik JPG, dan **laporan PDF** — untuk **semua bendungan** maupun **hanya yang di bawah BON B** |
@@ -203,6 +212,26 @@ python run_pipeline.py
 # 4. Buka dashboard
 streamlit run app.py
 ```
+
+### Rutinitas bulanan (prediksi bergulir otomatis)
+
+Cukup jalankan `python run_pipeline.py` **setiap awal bulan** (setelah data
+bulan sebelumnya masuk ke SINBAD) — semua bergulir otomatis:
+
+1. Cutoff terdeteksi sendiri dari data (periode lengkap terakhir), prediksi
+   dimulai dari **bulan berjalan** + bulan-bulan berikutnya.
+2. Prediksi run sebelumnya **diarsipkan** lalu **dibandingkan dengan
+   realisasi yang baru masuk** — error dan kesesuaian status BON per
+   bendungan per periode terakumulasi di menu 🎯 Akurasi Model.
+3. Commit & push → Streamlit Cloud redeploy otomatis.
+
+Agar benar-benar tanpa sentuhan, jadwalkan lewat Windows Task Scheduler
+(mis. tanggal 2 tiap bulan, di jaringan internal PU):
+`python f:\...\run_pipeline.py` diikuti `git add -A && git commit && git push`.
+
+Catatan horizon lintas tahun: periode prediksi yang jatuh setelah Desember
+tahun berjalan DIPANGKAS (dashboard dan label periode 'MM-PP' berbasis satu
+tahun kalender). Run awal Januari otomatis memprediksi Jan–Mei tahun baru.
 
 ## Deploy ke Streamlit Community Cloud
 

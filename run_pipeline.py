@@ -46,6 +46,7 @@ def main():
     jalankan("src/hitung_inflow.py")
     jalankan("src/train_lstm.py")
     jalankan("src/predict_2026.py")
+    jalankan("src/akurasi.py")      # arsip run + akurasi vs realisasi baru
     jalankan("src/evaluasi.py")
 
     print("\n" + "=" * 60)
