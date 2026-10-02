@@ -2,6 +2,7 @@
 # JANGAN PERNAH DI-COMMIT — berisi kredensial database internal
 # ============================================================
 config.yaml
+config.cloud.yaml
 .streamlit/secrets.toml
 
 # Data mentah hasil ekstraksi database internal (regenerasi dengan:
@@ -9,7 +10,7 @@ config.yaml
 # dipakai dashboard untuk konversi volume <-> elevasi (kecukupan air).
 data/raw/*
 !data/raw/storagecurve_harian.parquet
-
+data_bon
 # File lock Excel (workbook sedang terbuka)
 ~$*
 **/~$*
