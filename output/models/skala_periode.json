@@ -1177,11 +1177,11 @@
       "format": "15 Harian"
     },
     "BD169": {
-      "tma_min": 41.133,
-      "tma_max": 50.188,
+      "tma_min": 41.268,
+      "tma_max": 50.065,
       "inflow_min": 0.0,
-      "inflow_max": 62.361,
-      "format": "10 Harian"
+      "inflow_max": 64.865,
+      "format": "15 Harian"
     },
     "BD170": {
       "tma_min": 62.73,
@@ -1490,7 +1490,7 @@
     "10 Harian": 15
   },
   "val_mae": {
-    "15 Harian": 0.05617297813296318,
-    "10 Harian": 0.07108115404844284
+    "15 Harian": 0.05452967807650566,
+    "10 Harian": 0.06766972690820694
   }
 }
