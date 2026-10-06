@@ -218,7 +218,10 @@ def ambil_periodik(kode: str, fmt: str):
     curve bendungan (DataFrame kosong bila tidak ada).
     """
     urut = daftar_periode(fmt, 1, 12)
-    b = (rtow_p[rtow_p["kode_bendungan"] == kode]
+    b = (rtow_p[
+            (rtow_p["kode_bendungan"] == kode) &
+            (rtow_p["format"] == fmt)
+         ]
          if not rtow_p.empty else pd.DataFrame())
     pb = (b.drop_duplicates("periode").set_index("periode").reindex(urut)
           if not b.empty else pd.DataFrame(index=urut))
