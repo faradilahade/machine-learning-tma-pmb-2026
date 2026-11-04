@@ -32,6 +32,7 @@ st.markdown("""<style>
 [data-testid=stMetric]{background:linear-gradient(180deg,#11324a,#0d2638);border:1px solid #1f4560;border-radius:14px;padding:12px 16px}
 [data-testid=stMetricLabel] p{color:#8fb3c7!important;font-weight:700}
 [data-testid=stMetricValue],[data-testid=stMetricValue] *{font-weight:800;color:#ffffff!important}
+[data-testid=stMetricDelta],[data-testid=stMetricDelta] *{color:#a7e3f2!important;font-weight:600}
 .stDownloadButton button{background:#0f766e;border:0}.stDownloadButton button,.stDownloadButton button *{color:#fff!important;font-weight:700}
 .an{background:#0d2638;border:1px solid #1f4560;border-left:5px solid #22d3ee;border-radius:12px;padding:12px 16px;margin:8px 0;line-height:1.6}
 .bd{padding:3px 14px;border-radius:999px;font-weight:700;color:#06121c}
@@ -276,8 +277,9 @@ with tab2:
     for r in runs:
         q = d[d.run_id == r].set_index("periode").reindex(per)
         fb.add_trace(go.Bar(x=x, y=q.error_m, name=rn(r), marker_color=RUN_C.get(r, "#fff"),
-                            text=[f(v) if pd.notna(v) else "" for v in q.error_m], textposition="outside"))
+                            text=[f(v) if pd.notna(v) else "" for v in q.error_m], textposition="outside", cliponaxis=False))
     fb.update_layout(barmode="group", title="Galat per periode (m)")
+    fb.update_yaxes(range=[min(-.6, d.error_m.min() - .5), d.error_m.max() + .8])
     c1.plotly_chart(tema(fb, 340), use_container_width=True, theme=None)
     tb = d.pivot_table(index="periode", columns="run_id", values="error_m").reindex(per)
     tb.columns = [rn(c) for c in tb.columns]
