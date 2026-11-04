@@ -36,6 +36,12 @@ st.markdown("""<style>
 .bd{padding:3px 14px;border-radius:999px;font-weight:700;color:#06121c}
 .cr{color:#8fb3c7;font-size:13px;border-top:1px solid #1f4560;margin-top:24px;padding-top:10px}
 button[data-baseweb=tab]{font-weight:700}
+.tw{max-height:380px;overflow:auto;border:1px solid #1f4560;border-radius:12px;margin:6px 0 18px}
+.tw table{border-collapse:collapse;width:100%;font-size:14px}
+.tw th{position:sticky;top:0;background:#11324a;color:#8fb3c7;text-align:left;padding:8px 12px;font-weight:700;white-space:nowrap}
+.tw td{padding:7px 12px;border-top:1px solid #1f4560;color:#eaf6fb;white-space:nowrap}
+.tw tr:hover td{background:#14405c}
+.sp{height:10px}
 </style>""", unsafe_allow_html=True)
 
 
@@ -65,11 +71,20 @@ def f(v, d=2):
     return f"{v:,.{d}f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 
+def html_tbl(df, idx=True, fmt=3):
+    d = df.copy()
+    for c in d.columns:
+        if pd.api.types.is_float_dtype(d[c]):
+            d[c] = d[c].map(lambda v: "" if pd.isna(v) else f(v, fmt))
+    st.markdown('<div class="tw">' + d.to_html(index=idx, border=0, escape=True) + '</div><div class="sp"></div>', unsafe_allow_html=True)
+
+
 def tema(fig, h):
-    fig.update_layout(height=h, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#0a1f2e", font=dict(color="#eaf6fb", size=13),
-                      margin=dict(l=10, r=10, t=50, b=10), hovermode="x unified", legend=dict(orientation="h", y=-0.22))
-    fig.update_xaxes(gridcolor="#1f4560")
-    fig.update_yaxes(gridcolor="#1f4560")
+    fig.update_layout(height=h, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#0a1f2e", font=dict(color="#eaf6fb", size=14),
+                      title_font=dict(color="#ffffff", size=18), hoverlabel=dict(bgcolor="#04101a", font=dict(color="#ffffff", size=14)),
+                      margin=dict(l=10, r=10, t=50, b=10), hovermode="x unified", legend=dict(orientation="h", y=-0.25, font=dict(color="#eaf6fb", size=14), bgcolor="rgba(0,0,0,0)"))
+    fig.update_xaxes(gridcolor="#1f4560", tickfont=dict(color="#cfe6f2"), title_font=dict(color="#eaf6fb"))
+    fig.update_yaxes(gridcolor="#1f4560", tickfont=dict(color="#cfe6f2"), title_font=dict(color="#eaf6fb"))
     return fig
 
 
@@ -89,7 +104,10 @@ tab1, tab2 = st.tabs(["📈 Pemantauan dan Prediksi", "🎯 Akurasi Model Juli d
 
 # ======================================================== TAB 1
 with tab1:
-    show25 = st.checkbox("Tampilkan TMA 2025 sebagai pembanding (data sensor valid)")
+    o1, o2, o3 = st.columns([1.3, 1.3, 2.4])
+    show25 = o1.toggle("Bandingkan dengan TMA 2025", help="Data sensor 2025 valid, sebelum pertengahan 2024 konstan sehingga tidak dipakai")
+    showband = o2.toggle("Pita galat model", value=True, help="Rata rata galat absolut LSTM pada backtest")
+    r0, r1 = o3.select_slider("Fokus periode", options=xl, value=(xl[0], xl[-1]))
     fig = go.Figure()
     if show25:
         h = hist[hist.tanggal.dt.year == 2025].set_index("periode").tma.reindex(urut)
@@ -106,8 +124,9 @@ with tab1:
                              line=dict(color=C["real"], width=4), marker=dict(size=7)))
     xp = [xr[-1]] + [pl(p) for p in fc.periode]
     yp = [tma_now] + list(fc.tma)
-    fig.add_trace(go.Scatter(x=xp, y=np.array(yp) + mae, line=dict(width=0), showlegend=False, hoverinfo="skip"))
-    fig.add_trace(go.Scatter(x=xp, y=np.array(yp) - mae, line=dict(width=0), fill="tonexty", fillcolor="rgba(163,230,53,.18)",
+    if showband:
+      fig.add_trace(go.Scatter(x=xp, y=np.array(yp) + mae, line=dict(width=0), showlegend=False, hoverinfo="skip"))
+      fig.add_trace(go.Scatter(x=xp, y=np.array(yp) - mae, line=dict(width=0), fill="tonexty", fillcolor="rgba(163,230,53,.18)",
                              name=f"Pita galat historis ± {f(mae)} m", hoverinfo="skip"))
     fig.add_trace(go.Scatter(x=xp, y=yp, name="TMA prediksi LSTM", mode="lines+markers",
                              line=dict(color=C["pred"], width=4, dash="dash"),
@@ -118,10 +137,10 @@ with tab1:
                                  marker=dict(size=18, symbol="circle-open", line=dict(color=C["bonb"], width=3)), hoverinfo="skip"))
     fig.add_vline(x=xr[-1], line=dict(color="#94a3b8", dash="dot"))
     fig.add_annotation(x=xr[-1], yref="paper", y=1.06, text="realisasi | prediksi", showarrow=False, font=dict(size=12, color="#8fb3c7"))
-    fig.update_layout(title=dict(text="Sandingan TMA per Periode 10 Harian 2026, Bendungan Gongseng", font=dict(size=18)),
+    fig.update_layout(title=dict(text="Sandingan TMA per Periode 10 Harian 2026, Bendungan Gongseng"),
                       yaxis_title="TMA (mdpl)", xaxis_title="Periode (bulan dan dasarian)")
-    fig.update_xaxes(type="category", categoryorder="array", categoryarray=xl, tickangle=-90, tickfont=dict(size=10))
-    st.plotly_chart(tema(fig, 560), use_container_width=True)
+    fig.update_xaxes(type="category", categoryorder="array", categoryarray=xl, tickangle=-90, range=[xl.index(r0) - .5, xl.index(r1) + .5])
+    st.plotly_chart(tema(fig, 560), use_container_width=True, theme=None)
 
     k = st.columns(4)
     k[0].metric(f"TMA realisasi terakhir ({pl(real.periode.iloc[-1])})", f"{f(tma_now)} mdpl")
@@ -133,8 +152,35 @@ with tab1:
     z = A_ if tma_now >= cur.bon_a else (AB_ if tma_now >= cur.bon_b else B_)
     wz = {A_: "#34d399", AB_: "#fbbf24", B_: "#fb7185"}[z]
     ik = {A_: "✅", AB_: "⚠️", B_: "🚨"}[z]
-    st.markdown(f"**Keputusan 3 zona, periode berjalan {pl(cur.periode)}:** <span class='bd' style='background:{wz}'>{ik} {z}</span> "
+    st.markdown(f"**Rekomendasi 3 Zona Operasi Waduk, periode berjalan {pl(cur.periode)}:** <span class='bd' style='background:{wz}'>{ik} {z}</span> "
                 f"&nbsp;<small>TMA terkini {f(tma_now)} mdpl · BON A {f(cur.bon_a)} mdpl · BON B {f(cur.bon_b)} mdpl</small>", unsafe_allow_html=True)
+
+    REK = {A_: "Pertahankan pola operasi sesuai RTOW dan lakukan pemantauan rutin.",
+           AB_: "Hemat pelepasan, prioritaskan kebutuhan pokok, laporkan pembacaan setiap hari.",
+           B_: "Batasi pelepasan air, lapor ke koordinator, dan terapkan pola operasi darurat kekeringan."}
+    st.info(f"**Tindakan:** {REK[z]}")
+    g1, g2 = st.columns(2)
+    with g1:
+        lo_, hi_ = ref["kekeringan"] - .5, max(cur.bon_a, tma_now) + .8
+        gg = go.Figure(go.Indicator(mode="gauge+number+delta", value=tma_now, number=dict(suffix=" mdpl", font=dict(color="#fff")),
+                                    delta=dict(reference=cur.bon_b, suffix=" m dari BON B", valueformat=".2f"),
+                                    title=dict(text="Posisi TMA terhadap BON", font=dict(color="#fff", size=16)),
+                                    gauge=dict(axis=dict(range=[lo_, hi_], tickcolor="#cfe6f2"), bar=dict(color=C["real"], thickness=.28),
+                                               steps=[dict(range=[lo_, cur.bon_b], color="#7f1d1d"), dict(range=[cur.bon_b, cur.bon_a], color="#78350f"),
+                                                      dict(range=[cur.bon_a, hi_], color="#064e3b")],
+                                               threshold=dict(line=dict(color="#fff", width=4), value=tma_now))))
+        gg.update_layout(height=260, paper_bgcolor="rgba(0,0,0,0)", font=dict(color="#eaf6fb"), margin=dict(l=20, r=20, t=50, b=10))
+        st.plotly_chart(gg, use_container_width=True, theme=None)
+    with g2:
+        st.markdown("**Simulasi sensitivitas**")
+        dlt = st.slider("Jika TMA aktual lebih rendah dari prediksi (m)", 0.0, 3.0, 0.0, 0.1, help="Uji seberapa cepat status turun bila kemarau lebih ekstrem dari prediksi")
+        s_ = fc.tma - dlt
+        m1, m2 = st.columns(2)
+        m1.metric("Periode di bawah BON A", f"{int((s_ < fc.bon_a).sum())} dari {len(fc)}")
+        m2.metric("Periode di bawah BON B", f"{int((s_ < fc.bon_b).sum())} dari {len(fc)}")
+        st.caption(f"TMA terendah skenario {f(s_.min())} mdpl, {f(s_.min() - ref['kekeringan'])} m dari elevasi kekeringan {f(ref['kekeringan'], 1)} mdpl.")
+        st.download_button("⬇️ Unduh prediksi (CSV)", pred[["periode", "tanggal", "tma", "jenis", "bon_a", "bon_b", "rtow", "status_bon"]].to_csv(index=False).encode("utf8"),
+                           "prediksi_gongseng.csv", "text/csv")
 
     din = pred.dropna(subset=["rtow", "bon_a", "bon_b"])
     luar = din[(din.rtow > din.bon_a + 1e-6) | (din.rtow < din.bon_b - 1e-6)]
@@ -169,7 +215,7 @@ with tab1:
 
     t = pred[["periode", "tanggal", "tma", "jenis", "bon_a", "bon_b", "rtow", "status_bon"]].copy()
     t["tanggal"] = t.tanggal.dt.strftime("%d %b %Y")
-    st.dataframe(t.round(3), use_container_width=True, hide_index=True, height=300)
+    html_tbl(t.rename(columns={"periode": "Periode", "tanggal": "Tanggal", "tma": "TMA", "jenis": "Jenis", "bon_a": "BON A", "bon_b": "BON B", "rtow": "RTOW", "status_bon": "Status BON"}), idx=False)
 
     # ---- neraca air
     st.markdown("#### 💧 Neraca air per periode (m³/detik)")
@@ -180,7 +226,7 @@ with tab1:
     fn.add_trace(go.Bar(x=xl, y=kb, name="Kebutuhan air", marker_color=C["keb"]))
     fn.update_layout(barmode="group", yaxis_title="m³/detik")
     fn.update_xaxes(type="category", categoryorder="array", categoryarray=xl, tickangle=-90, tickfont=dict(size=10))
-    st.plotly_chart(tema(fn, 340), use_container_width=True)
+    st.plotly_chart(tema(fn, 340), use_container_width=True, theme=None)
     i = urut.index(cur.periode)
     if kt[i] is not None and kb[i] is not None:
         d_ = kt[i] - kb[i]
@@ -222,7 +268,7 @@ with tab2:
         g.add_trace(go.Scatter(x=x, y=q.tma_prediksi, name=rn(r), mode="lines+markers", line=dict(color=RUN_C.get(r, "#fff"), width=3, dash="dash"),
                                marker=dict(size=11, symbol="diamond")))
     g.update_layout(title=f"Prediksi dan realisasi {nm} 2026", yaxis_title="TMA (mdpl)")
-    st.plotly_chart(tema(g, 400), use_container_width=True)
+    st.plotly_chart(tema(g, 400), use_container_width=True, theme=None)
 
     c1, c2 = st.columns(2)
     fb = go.Figure()
@@ -231,14 +277,15 @@ with tab2:
         fb.add_trace(go.Bar(x=x, y=q.error_m, name=rn(r), marker_color=RUN_C.get(r, "#fff"),
                             text=[f(v) if pd.notna(v) else "" for v in q.error_m], textposition="outside"))
     fb.update_layout(barmode="group", title="Galat per periode (m)")
-    c1.plotly_chart(tema(fb, 340), use_container_width=True)
+    c1.plotly_chart(tema(fb, 340), use_container_width=True, theme=None)
     tb = d.pivot_table(index="periode", columns="run_id", values="error_m").reindex(per)
     tb.columns = [rn(c) for c in tb.columns]
     tb.insert(0, "Realisasi (m)", rl.tma_realisasi.values)
     tb.insert(1, "BON B (m)", rl.bon_b.values)
     tb.index = x
     c2.markdown("**Tabel rinci (galat dalam meter)**")
-    c2.dataframe(tb.round(3), use_container_width=True)
+    with c2:
+        html_tbl(tb)
 
     st.markdown("#### Analisis terhadap BON B")
     rows = []
@@ -250,7 +297,7 @@ with tab2:
                      "Prediksi di bawah BON B": int((q.tma_prediksi < q.bon_b).sum())})
     rt = pd.DataFrame(rows).set_index("Running")
     rt["Selisih jarak (m)"] = rt.iloc[:, 1] - rt.iloc[:, 2]
-    st.dataframe(rt.round(3), use_container_width=True)
+    html_tbl(rt)
     jr = (rl.tma_realisasi - rl.bon_b).min()
     for t_ in [
         f"<b>Ringkasan.</b> Untuk {nm}, MAE {rn(a_r)} {f(rk.loc[a_r, 'mae'])} m dan {rn(b_r)} {f(rk.loc[b_r, 'mae'])} m, galat "
@@ -272,7 +319,7 @@ with tab2:
             zz = z.groupby("run_id").agg(MAE=("error_m", lambda s: s.abs().mean()), Bias=("error_m", "mean")).round(3)
             zz.index = [rn(i) for i in zz.index]
             st.caption("Periode pembanding: " + ", ".join(pl(c) for c in com))
-            st.dataframe(zz, use_container_width=True)
+            html_tbl(zz)
         else:
             st.info("Belum ada periode yang tercakup oleh dua running atau lebih.")
 
