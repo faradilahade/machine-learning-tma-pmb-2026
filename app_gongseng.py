@@ -49,8 +49,15 @@ button[data-baseweb=tab]{font-weight:700}
 </style>""", unsafe_allow_html=True)
 
 
+def versi_data():
+    """Kunci cache: berubah bila file data berubah, agar data lama tidak tersangkut di cache."""
+    fs = [os.path.join(ROOT, "output", "prediksi", n) for n in ("prediksi_tma_2026.parquet", "akurasi_realisasi.parquet", "evaluasi_metode.parquet")]
+    fs += [os.path.join(ROOT, "data_gongseng", "ref_gongseng.json"), os.path.join(ROOT, "data", "processed", "tma_periode.parquet")]
+    return tuple(os.path.getmtime(x) for x in fs)
+
+
 @st.cache_data(show_spinner=False)
-def muat():
+def muat(versi):
     P = os.path.join(ROOT, "output", "prediksi")
     flt = [("kode_bendungan", "==", KODE)]
     pred = pd.read_parquet(os.path.join(P, "prediksi_tma_2026.parquet"), filters=flt).sort_values("tanggal")
@@ -92,7 +99,7 @@ def tema(fig, h):
     return fig
 
 
-pred, acc, ev, hist, ref, sm = muat()
+pred, acc, ev, hist, ref, sm = muat(versi_data())
 # BON A, BON B, dan RTOW per periode dari workbook RTOW periodik (sama dengan dashboard DDEWOMS)
 for k_ in ("bon_a", "bon_b", "rtow"):
     pred[k_] = pred.periode.map(ref[k_])
