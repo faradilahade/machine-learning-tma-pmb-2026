@@ -31,7 +31,8 @@ st.markdown("""<style>
 .block-container{padding-top:1.4rem;max-width:1400px}
 [data-testid=stMetric]{background:linear-gradient(180deg,#11324a,#0d2638);border:1px solid #1f4560;border-radius:14px;padding:12px 16px}
 [data-testid=stMetricLabel] p{color:#8fb3c7!important;font-weight:700}
-[data-testid=stMetricValue]{font-weight:800}
+[data-testid=stMetricValue],[data-testid=stMetricValue] *{font-weight:800;color:#ffffff!important}
+.stDownloadButton button{background:#0f766e;border:0}.stDownloadButton button,.stDownloadButton button *{color:#fff!important;font-weight:700}
 .an{background:#0d2638;border:1px solid #1f4560;border-left:5px solid #22d3ee;border-radius:12px;padding:12px 16px;margin:8px 0;line-height:1.6}
 .bd{padding:3px 14px;border-radius:999px;font-weight:700;color:#06121c}
 .cr{color:#8fb3c7;font-size:13px;border-top:1px solid #1f4560;margin-top:24px;padding-top:10px}
@@ -84,7 +85,7 @@ def tema(fig, h):
                       title_font=dict(color="#ffffff", size=18), hoverlabel=dict(bgcolor="#04101a", font=dict(color="#ffffff", size=14)),
                       margin=dict(l=10, r=10, t=50, b=10), hovermode="x unified", legend=dict(orientation="h", y=-0.25, font=dict(color="#eaf6fb", size=14), bgcolor="rgba(0,0,0,0)"))
     fig.update_xaxes(gridcolor="#1f4560", tickfont=dict(color="#cfe6f2"), title_font=dict(color="#eaf6fb"))
-    fig.update_yaxes(gridcolor="#1f4560", tickfont=dict(color="#cfe6f2"), title_font=dict(color="#eaf6fb"))
+    fig.update_yaxes(automargin=True, gridcolor="#1f4560", tickfont=dict(color="#cfe6f2"), title_font=dict(color="#eaf6fb"))
     return fig
 
 
