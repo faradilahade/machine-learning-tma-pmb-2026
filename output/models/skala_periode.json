@@ -1,7 +1,7 @@
 {
   "skala": {
     "BD001": {
-      "tma_min": 221.402,
+      "tma_min": 221.233,
       "tma_max": 229.034,
       "inflow_min": 0.0,
       "inflow_max": 0.439,
@@ -15,35 +15,35 @@
       "format": "15 Harian"
     },
     "BD003": {
-      "tma_min": 180.156,
+      "tma_min": 179.089,
       "tma_max": 185.118,
       "inflow_min": 0.0,
       "inflow_max": 4.673,
       "format": "15 Harian"
     },
     "BD004": {
-      "tma_min": 200.111,
+      "tma_min": 200.06,
       "tma_max": 203.941,
       "inflow_min": 0.0,
       "inflow_max": 0.367,
       "format": "15 Harian"
     },
     "BD005": {
-      "tma_min": 219.035,
+      "tma_min": 218.823,
       "tma_max": 224.033,
       "inflow_min": 0.0,
       "inflow_max": 0.472,
       "format": "15 Harian"
     },
     "BD006": {
-      "tma_min": 117.515,
+      "tma_min": 117.203,
       "tma_max": 119.082,
-      "inflow_min": 0.001,
+      "inflow_min": 0.0,
       "inflow_max": 3.566,
       "format": "15 Harian"
     },
     "BD007": {
-      "tma_min": 162.615,
+      "tma_min": 162.46,
       "tma_max": 165.828,
       "inflow_min": 0.0,
       "inflow_max": 0.216,
@@ -57,7 +57,7 @@
       "format": "15 Harian"
     },
     "BD009": {
-      "tma_min": 108.105,
+      "tma_min": 108.043,
       "tma_max": 110.728,
       "inflow_min": 0.0,
       "inflow_max": 1.043,
@@ -71,14 +71,14 @@
       "format": "15 Harian"
     },
     "BD011": {
-      "tma_min": 137.755,
+      "tma_min": 137.19,
       "tma_max": 140.666,
       "inflow_min": 0.002,
       "inflow_max": 5.335,
       "format": "15 Harian"
     },
     "BD012": {
-      "tma_min": 197.058,
+      "tma_min": 196.85,
       "tma_max": 204.944,
       "inflow_min": 0.0,
       "inflow_max": 2.319,
@@ -106,168 +106,168 @@
       "format": "15 Harian"
     },
     "BD016": {
-      "tma_min": 186.968,
+      "tma_min": 186.86,
       "tma_max": 189.633,
       "inflow_min": 0.0,
       "inflow_max": 0.056,
       "format": "15 Harian"
     },
     "BD017": {
-      "tma_min": 278.292,
+      "tma_min": 277.99,
       "tma_max": 283.048,
       "inflow_min": 0.0,
       "inflow_max": 24.289,
       "format": "15 Harian"
     },
     "BD018": {
-      "tma_min": 167.516,
+      "tma_min": 167.284,
       "tma_max": 171.333,
       "inflow_min": 0.0,
       "inflow_max": 0.474,
       "format": "15 Harian"
     },
     "BD019": {
-      "tma_min": 316.14,
+      "tma_min": 316.13,
       "tma_max": 325.5,
       "inflow_min": 0.0,
       "inflow_max": 0.285,
       "format": "15 Harian"
     },
     "BD020": {
-      "tma_min": 123.35,
+      "tma_min": 123.45,
       "tma_max": 129.2,
       "inflow_min": 0.0,
       "inflow_max": 0.363,
       "format": "15 Harian"
     },
     "BD021": {
-      "tma_min": 499.708,
+      "tma_min": 499.539,
       "tma_max": 515.129,
-      "inflow_min": 0.336,
+      "inflow_min": 0.281,
       "inflow_max": 100.701,
       "format": "15 Harian"
     },
     "BD022": {
-      "tma_min": 194.62,
+      "tma_min": 191.728,
       "tma_max": 220.902,
       "inflow_min": 0.0,
       "inflow_max": 2272.443,
       "format": "10 Harian"
     },
     "BD023": {
-      "tma_min": 797.303,
+      "tma_min": 794.908,
       "tma_max": 810.079,
       "inflow_min": 0.001,
       "inflow_max": 20.909,
       "format": "10 Harian"
     },
     "BD024": {
-      "tma_min": 1296.197,
+      "tma_min": 1295.807,
       "tma_max": 1300.64,
       "inflow_min": 0.0,
       "inflow_max": 79.406,
       "format": "10 Harian"
     },
     "BD025": {
-      "tma_min": 183.492,
+      "tma_min": 182.448,
       "tma_max": 192.43,
       "inflow_min": 0.076,
       "inflow_max": 78.396,
       "format": "10 Harian"
     },
     "BD026": {
-      "tma_min": 76.82,
+      "tma_min": 76.776,
       "tma_max": 84.268,
       "inflow_min": 0.0,
       "inflow_max": 2.17,
       "format": "10 Harian"
     },
     "BD027": {
-      "tma_min": 107.667,
+      "tma_min": 107.497,
       "tma_max": 110.08,
       "inflow_min": 0.0,
       "inflow_max": 4.367,
       "format": "10 Harian"
     },
     "BD028": {
-      "tma_min": 89.002,
+      "tma_min": 88.577,
       "tma_max": 93.289,
       "inflow_min": 0.0,
       "inflow_max": 6.066,
       "format": "10 Harian"
     },
     "BD029": {
-      "tma_min": 113.997,
+      "tma_min": 112.983,
       "tma_max": 118.039,
       "inflow_min": 0.0,
       "inflow_max": 0.469,
       "format": "10 Harian"
     },
     "BD030": {
-      "tma_min": 143.687,
+      "tma_min": 143.193,
       "tma_max": 149.039,
       "inflow_min": 0.0,
       "inflow_max": 0.668,
       "format": "10 Harian"
     },
     "BD031": {
-      "tma_min": 98.6,
+      "tma_min": 96.828,
       "tma_max": 106.556,
       "inflow_min": 0.0,
       "inflow_max": 4.924,
       "format": "10 Harian"
     },
     "BD032": {
-      "tma_min": 119.837,
+      "tma_min": 119.46,
       "tma_max": 127.804,
       "inflow_min": 0.0,
       "inflow_max": 2.996,
       "format": "10 Harian"
     },
     "BD033": {
-      "tma_min": 30.673,
+      "tma_min": 29.892,
       "tma_max": 38.216,
       "inflow_min": 0.0,
       "inflow_max": 9.899,
       "format": "10 Harian"
     },
     "BD034": {
-      "tma_min": 87.428,
+      "tma_min": 86.98,
       "tma_max": 93.34,
       "inflow_min": 0.0,
       "inflow_max": 23.734,
       "format": "10 Harian"
     },
     "BD035": {
-      "tma_min": 105.448,
+      "tma_min": 104.526,
       "tma_max": 115.286,
       "inflow_min": 0.0,
       "inflow_max": 21.019,
       "format": "10 Harian"
     },
     "BD036": {
-      "tma_min": 40.95,
+      "tma_min": 39.008,
       "tma_max": 49.049,
       "inflow_min": 0.0,
       "inflow_max": 2.499,
       "format": "10 Harian"
     },
     "BD037": {
-      "tma_min": 84.007,
+      "tma_min": 83.883,
       "tma_max": 87.702,
-      "inflow_min": 0.748,
+      "inflow_min": 0.552,
       "inflow_max": 10.416,
       "format": "10 Harian"
     },
     "BD038": {
       "tma_min": 114.807,
       "tma_max": 120.146,
-      "inflow_min": 2.118,
+      "inflow_min": 2.443,
       "inflow_max": 69.512,
       "format": "10 Harian"
     },
     "BD039": {
-      "tma_min": 42.735,
+      "tma_min": 42.553,
       "tma_max": 43.337,
       "inflow_min": 0.0,
       "inflow_max": 10.591,
@@ -276,14 +276,14 @@
     "BD040": {
       "tma_min": 159.0,
       "tma_max": 165.124,
-      "inflow_min": 0.001,
+      "inflow_min": 0.002,
       "inflow_max": 1.179,
       "format": "10 Harian"
     },
     "BD041": {
-      "tma_min": 232.194,
+      "tma_min": 230.59,
       "tma_max": 239.184,
-      "inflow_min": 0.192,
+      "inflow_min": 0.155,
       "inflow_max": 15.362,
       "format": "10 Harian"
     },
@@ -295,7 +295,7 @@
       "format": "10 Harian"
     },
     "BD043": {
-      "tma_min": 170.161,
+      "tma_min": 169.8,
       "tma_max": 175.56,
       "inflow_min": 0.0,
       "inflow_max": 0.017,
@@ -316,16 +316,16 @@
       "format": "10 Harian"
     },
     "BD046": {
-      "tma_min": 60.13,
+      "tma_min": 60.123,
       "tma_max": 63.487,
       "inflow_min": 0.0,
       "inflow_max": 0.014,
       "format": "10 Harian"
     },
     "BD047": {
-      "tma_min": 93.82,
+      "tma_min": 92.814,
       "tma_max": 105.542,
-      "inflow_min": 0.098,
+      "inflow_min": 0.127,
       "inflow_max": 47.017,
       "format": "15 Harian"
     },
@@ -344,9 +344,9 @@
       "format": "15 Harian"
     },
     "BD050": {
-      "tma_min": 236.801,
+      "tma_min": 233.127,
       "tma_max": 259.237,
-      "inflow_min": 6.974,
+      "inflow_min": 4.366,
       "inflow_max": 262.361,
       "format": "15 Harian"
     },
@@ -365,7 +365,7 @@
       "format": "15 Harian"
     },
     "BD053": {
-      "tma_min": 706.755,
+      "tma_min": 705.01,
       "tma_max": 712.652,
       "inflow_min": 0.0,
       "inflow_max": 64.304,
@@ -379,16 +379,16 @@
       "format": "15 Harian"
     },
     "BD055": {
-      "tma_min": 49.103,
+      "tma_min": 48.662,
       "tma_max": 55.783,
-      "inflow_min": 0.0,
+      "inflow_min": 0.058,
       "inflow_max": 26.47,
       "format": "15 Harian"
     },
     "BD056": {
-      "tma_min": 75.887,
+      "tma_min": 74.213,
       "tma_max": 80.267,
-      "inflow_min": 3.004,
+      "inflow_min": 0.788,
       "inflow_max": 704.362,
       "format": "15 Harian"
     },
@@ -402,7 +402,7 @@
     "BD058": {
       "tma_min": 116.735,
       "tma_max": 124.318,
-      "inflow_min": 6.496,
+      "inflow_min": 6.506,
       "inflow_max": 82.408,
       "format": "15 Harian"
     },
@@ -416,7 +416,7 @@
     "BD060": {
       "tma_min": 47.565,
       "tma_max": 54.298,
-      "inflow_min": 1.493,
+      "inflow_min": 1.5,
       "inflow_max": 66.385,
       "format": "15 Harian"
     },
@@ -435,14 +435,14 @@
       "format": "15 Harian"
     },
     "BD063": {
-      "tma_min": 37.6,
+      "tma_min": 37.5,
       "tma_max": 40.89,
       "inflow_min": 0.0,
       "inflow_max": 0.257,
       "format": "15 Harian"
     },
     "BD064": {
-      "tma_min": 101.572,
+      "tma_min": 100.943,
       "tma_max": 108.859,
       "inflow_min": 0.0,
       "inflow_max": 4.866,
@@ -458,7 +458,7 @@
     "BD066": {
       "tma_min": 65.61,
       "tma_max": 67.139,
-      "inflow_min": 0.018,
+      "inflow_min": 0.0,
       "inflow_max": 6.37,
       "format": "15 Harian"
     },
@@ -484,7 +484,7 @@
       "format": "15 Harian"
     },
     "BD070": {
-      "tma_min": 118.1,
+      "tma_min": 117.861,
       "tma_max": 120.112,
       "inflow_min": 0.0,
       "inflow_max": 10.929,
@@ -533,14 +533,14 @@
       "format": "10 Harian"
     },
     "BD077": {
-      "tma_min": 139.55,
+      "tma_min": 139.261,
       "tma_max": 150.164,
-      "inflow_min": 0.037,
+      "inflow_min": 0.131,
       "inflow_max": 7.602,
       "format": "10 Harian"
     },
     "BD078": {
-      "tma_min": 39.334,
+      "tma_min": 39.094,
       "tma_max": 48.029,
       "inflow_min": 0.0,
       "inflow_max": 3.589,
@@ -596,7 +596,7 @@
       "format": "10 Harian"
     },
     "BD086": {
-      "tma_min": 23.4,
+      "tma_min": 23.591,
       "tma_max": 27.788,
       "inflow_min": 0.0,
       "inflow_max": 0.461,
@@ -617,7 +617,7 @@
       "format": "10 Harian"
     },
     "BD089": {
-      "tma_min": 17.895,
+      "tma_min": 17.82,
       "tma_max": 26.859,
       "inflow_min": 0.0,
       "inflow_max": 3.235,
@@ -631,21 +631,21 @@
       "format": "10 Harian"
     },
     "BD091": {
-      "tma_min": 560.6,
+      "tma_min": 560.432,
       "tma_max": 571.705,
       "inflow_min": 0.0,
       "inflow_max": 0.027,
       "format": "10 Harian"
     },
     "BD092": {
-      "tma_min": 522.244,
+      "tma_min": 521.735,
       "tma_max": 525.593,
       "inflow_min": 0.0,
       "inflow_max": 0.03,
       "format": "10 Harian"
     },
     "BD093": {
-      "tma_min": 54.524,
+      "tma_min": 54.503,
       "tma_max": 55.687,
       "inflow_min": 0.0,
       "inflow_max": 0.016,
@@ -659,14 +659,14 @@
       "format": "10 Harian"
     },
     "BD095": {
-      "tma_min": 90.032,
+      "tma_min": 89.756,
       "tma_max": 92.536,
       "inflow_min": 0.009,
       "inflow_max": 130.796,
       "format": "10 Harian"
     },
     "BD096": {
-      "tma_min": 152.186,
+      "tma_min": 152.174,
       "tma_max": 169.392,
       "inflow_min": 0.0,
       "inflow_max": 0.166,
@@ -694,7 +694,7 @@
       "format": "10 Harian"
     },
     "BD100": {
-      "tma_min": 112.5,
+      "tma_min": 112.4,
       "tma_max": 121.032,
       "inflow_min": 0.0,
       "inflow_max": 0.074,
@@ -715,7 +715,7 @@
       "format": "10 Harian"
     },
     "BD103": {
-      "tma_min": 384.657,
+      "tma_min": 384.573,
       "tma_max": 384.789,
       "inflow_min": 0.0,
       "inflow_max": 0.15,
@@ -743,7 +743,7 @@
       "format": "10 Harian"
     },
     "BD107": {
-      "tma_min": 274.022,
+      "tma_min": 273.183,
       "tma_max": 281.523,
       "inflow_min": 0.0,
       "inflow_max": 16.11,
@@ -771,16 +771,16 @@
       "format": "10 Harian"
     },
     "BD111": {
-      "tma_min": 72.985,
+      "tma_min": 71.941,
       "tma_max": 75.649,
       "inflow_min": 0.0,
       "inflow_max": 4.939,
       "format": "10 Harian"
     },
     "BD112": {
-      "tma_min": 99.255,
+      "tma_min": 95.402,
       "tma_max": 115.469,
-      "inflow_min": 1.188,
+      "inflow_min": 0.713,
       "inflow_max": 65.821,
       "format": "10 Harian"
     },
@@ -799,9 +799,9 @@
       "format": "10 Harian"
     },
     "BD115": {
-      "tma_min": 101.488,
+      "tma_min": 100.125,
       "tma_max": 116.178,
-      "inflow_min": 0.001,
+      "inflow_min": 0.0,
       "inflow_max": 15.392,
       "format": "10 Harian"
     },
@@ -855,7 +855,7 @@
       "format": "10 Harian"
     },
     "BD123": {
-      "tma_min": 117.92,
+      "tma_min": 117.691,
       "tma_max": 123.131,
       "inflow_min": 0.0,
       "inflow_max": 0.228,
@@ -864,7 +864,7 @@
     "BD124": {
       "tma_min": 51.03,
       "tma_max": 60.321,
-      "inflow_min": 0.035,
+      "inflow_min": 0.013,
       "inflow_max": 27.818,
       "format": "10 Harian"
     },
@@ -925,21 +925,21 @@
       "format": "10 Harian"
     },
     "BD133": {
-      "tma_min": 43.422,
+      "tma_min": 42.791,
       "tma_max": 57.182,
       "inflow_min": 0.0,
       "inflow_max": 102.781,
       "format": "10 Harian"
     },
     "BD134": {
-      "tma_min": 215.658,
+      "tma_min": 215.313,
       "tma_max": 218.187,
-      "inflow_min": 0.024,
+      "inflow_min": 0.026,
       "inflow_max": 16.301,
       "format": "15 Harian"
     },
     "BD135": {
-      "tma_min": 74.944,
+      "tma_min": 72.448,
       "tma_max": 75.7,
       "inflow_min": 0.002,
       "inflow_max": 0.177,
@@ -967,16 +967,16 @@
       "format": "15 Harian"
     },
     "BD139": {
-      "tma_min": 25.253,
+      "tma_min": 23.0,
       "tma_max": 27.0,
       "inflow_min": 0.0,
       "inflow_max": 0.385,
       "format": "15 Harian"
     },
     "BD140": {
-      "tma_min": 44.47,
+      "tma_min": 44.0,
       "tma_max": 47.314,
-      "inflow_min": 0.001,
+      "inflow_min": 0.0,
       "inflow_max": 1.035,
       "format": "15 Harian"
     },
@@ -995,14 +995,14 @@
       "format": "15 Harian"
     },
     "BD143": {
-      "tma_min": 92.719,
+      "tma_min": 92.02,
       "tma_max": 100.151,
       "inflow_min": 0.0,
       "inflow_max": 558.288,
       "format": "15 Harian"
     },
     "BD144": {
-      "tma_min": 362.464,
+      "tma_min": 362.376,
       "tma_max": 375.315,
       "inflow_min": 0.0,
       "inflow_max": 21.512,
@@ -1016,7 +1016,7 @@
       "format": "15 Harian"
     },
     "BD146": {
-      "tma_min": 365.481,
+      "tma_min": 365.0,
       "tma_max": 368.918,
       "inflow_min": 0.01,
       "inflow_max": 4.539,
@@ -1025,12 +1025,12 @@
     "BD147": {
       "tma_min": 332.733,
       "tma_max": 339.144,
-      "inflow_min": 0.04,
+      "inflow_min": 0.025,
       "inflow_max": 1.351,
       "format": "15 Harian"
     },
     "BD148": {
-      "tma_min": 806.74,
+      "tma_min": 805.683,
       "tma_max": 810.396,
       "inflow_min": 0.0,
       "inflow_max": 7.662,
@@ -1044,7 +1044,7 @@
       "format": "15 Harian"
     },
     "BD150": {
-      "tma_min": 67.252,
+      "tma_min": 67.136,
       "tma_max": 77.655,
       "inflow_min": 0.0,
       "inflow_max": 30.64,
@@ -1058,7 +1058,7 @@
       "format": "15 Harian"
     },
     "BD152": {
-      "tma_min": 61.21,
+      "tma_min": 61.071,
       "tma_max": 63.733,
       "inflow_min": 0.0,
       "inflow_max": 0.158,
@@ -1079,14 +1079,14 @@
       "format": "15 Harian"
     },
     "BD155": {
-      "tma_min": 45.074,
+      "tma_min": 44.753,
       "tma_max": 47.014,
       "inflow_min": 0.0,
       "inflow_max": 0.234,
       "format": "15 Harian"
     },
     "BD156": {
-      "tma_min": 80.259,
+      "tma_min": 80.099,
       "tma_max": 81.554,
       "inflow_min": 0.0,
       "inflow_max": 0.684,
@@ -1100,21 +1100,21 @@
       "format": "15 Harian"
     },
     "BD158": {
-      "tma_min": 194.92,
+      "tma_min": 193.95,
       "tma_max": 207.09,
       "inflow_min": 0.0,
       "inflow_max": 86.642,
       "format": "15 Harian"
     },
     "BD159": {
-      "tma_min": 116.57,
+      "tma_min": 115.88,
       "tma_max": 120.118,
       "inflow_min": 0.0,
       "inflow_max": 134.539,
       "format": "15 Harian"
     },
     "BD160": {
-      "tma_min": 308.015,
+      "tma_min": 307.2,
       "tma_max": 320.101,
       "inflow_min": 0.0,
       "inflow_max": 1.255,
@@ -1130,33 +1130,33 @@
     "BD162": {
       "tma_min": 78.046,
       "tma_max": 88.796,
-      "inflow_min": 0.065,
+      "inflow_min": 0.176,
       "inflow_max": 18.318,
       "format": "15 Harian"
     },
     "BD163": {
-      "tma_min": 67.325,
+      "tma_min": 66.85,
       "tma_max": 70.046,
-      "inflow_min": 0.014,
+      "inflow_min": 0.009,
       "inflow_max": 3.897,
       "format": "15 Harian"
     },
     "BD164": {
-      "tma_min": 91.735,
+      "tma_min": 91.483,
       "tma_max": 94.427,
       "inflow_min": 0.0,
       "inflow_max": 3.187,
       "format": "15 Harian"
     },
     "BD165": {
-      "tma_min": 112.8,
+      "tma_min": 112.6,
       "tma_max": 120.517,
       "inflow_min": 0.0,
       "inflow_max": 0.458,
       "format": "15 Harian"
     },
     "BD166": {
-      "tma_min": 236.185,
+      "tma_min": 236.053,
       "tma_max": 239.448,
       "inflow_min": 0.0,
       "inflow_max": 79.947,
@@ -1165,7 +1165,7 @@
     "BD167": {
       "tma_min": 82.612,
       "tma_max": 99.543,
-      "inflow_min": 4.918,
+      "inflow_min": 3.798,
       "inflow_max": 397.242,
       "format": "15 Harian"
     },
@@ -1198,21 +1198,21 @@
       "format": "15 Harian"
     },
     "BD172": {
-      "tma_min": 224.787,
+      "tma_min": 225.04,
       "tma_max": 248.637,
-      "inflow_min": 0.569,
+      "inflow_min": 0.299,
       "inflow_max": 84.457,
       "format": "15 Harian"
     },
     "BD173": {
-      "tma_min": 112.45,
+      "tma_min": 110.602,
       "tma_max": 126.307,
       "inflow_min": 0.0,
       "inflow_max": 56.386,
       "format": "15 Harian"
     },
     "BD174": {
-      "tma_min": 59.22,
+      "tma_min": 59.021,
       "tma_max": 72.04,
       "inflow_min": 0.0,
       "inflow_max": 11.929,
@@ -1221,7 +1221,7 @@
     "BD175": {
       "tma_min": 160.03,
       "tma_max": 182.761,
-      "inflow_min": 0.331,
+      "inflow_min": 0.176,
       "inflow_max": 66.324,
       "format": "15 Harian"
     },
@@ -1234,13 +1234,13 @@
     },
     "BD177": {
       "tma_min": 190.867,
-      "tma_max": 238.461,
+      "tma_max": 246.822,
       "inflow_min": 0.0,
-      "inflow_max": 11.373,
+      "inflow_max": 48.355,
       "format": "15 Harian"
     },
     "BD178": {
-      "tma_min": 117.287,
+      "tma_min": 116.697,
       "tma_max": 126.138,
       "inflow_min": 0.0,
       "inflow_max": 2.346,
@@ -1254,14 +1254,14 @@
       "format": "15 Harian"
     },
     "BD180": {
-      "tma_min": 131.262,
+      "tma_min": 131.304,
       "tma_max": 155.762,
-      "inflow_min": 0.802,
+      "inflow_min": 0.824,
       "inflow_max": 13.818,
       "format": "15 Harian"
     },
     "BD181": {
-      "tma_min": 160.45,
+      "tma_min": 159.778,
       "tma_max": 171.819,
       "inflow_min": 0.0,
       "inflow_max": 30.434,
@@ -1275,56 +1275,56 @@
       "format": "15 Harian"
     },
     "BD183": {
-      "tma_min": 195.588,
-      "tma_max": 199.23,
-      "inflow_min": 0.064,
+      "tma_min": 195.695,
+      "tma_max": 199.28,
+      "inflow_min": 0.146,
       "inflow_max": 24.338,
       "format": "15 Harian"
     },
     "BD184": {
-      "tma_min": 133.36,
+      "tma_min": 129.464,
       "tma_max": 145.594,
       "inflow_min": 0.0,
       "inflow_max": 20.807,
       "format": "10 Harian"
     },
     "BD185": {
-      "tma_min": 10.575,
+      "tma_min": 10.423,
       "tma_max": 11.51,
-      "inflow_min": 0.048,
+      "inflow_min": 0.047,
       "inflow_max": 2.256,
       "format": "15 Harian"
     },
     "BD186": {
-      "tma_min": 6.312,
+      "tma_min": 6.0,
       "tma_max": 7.653,
-      "inflow_min": 0.014,
+      "inflow_min": 0.005,
       "inflow_max": 21.767,
       "format": "15 Harian"
     },
     "BD187": {
-      "tma_min": 15.54,
+      "tma_min": 15.571,
       "tma_max": 15.923,
       "inflow_min": 0.0,
-      "inflow_max": 0.078,
+      "inflow_max": 0.113,
       "format": "15 Harian"
     },
     "BD188": {
-      "tma_min": 9.75,
+      "tma_min": 9.453,
       "tma_max": 11.11,
       "inflow_min": 0.0,
       "inflow_max": 2.788,
       "format": "15 Harian"
     },
     "BD189": {
-      "tma_min": 104.943,
+      "tma_min": 104.504,
       "tma_max": 114.255,
       "inflow_min": 0.0,
       "inflow_max": 38.837,
       "format": "15 Harian"
     },
     "BD190": {
-      "tma_min": 104.03,
+      "tma_min": 104.193,
       "tma_max": 119.939,
       "inflow_min": 0.0,
       "inflow_max": 3.898,
@@ -1333,7 +1333,7 @@
     "BD191": {
       "tma_min": 118.145,
       "tma_max": 122.59,
-      "inflow_min": 1.586,
+      "inflow_min": 1.271,
       "inflow_max": 37.844,
       "format": "15 Harian"
     },
@@ -1355,13 +1355,13 @@
       "tma_min": 38.24,
       "tma_max": 57.619,
       "inflow_min": 0.0,
-      "inflow_max": 1.363,
+      "inflow_max": 1.484,
       "format": "15 Harian"
     },
     "BD195": {
       "tma_min": 505.501,
       "tma_max": 517.336,
-      "inflow_min": 3.38,
+      "inflow_min": 2.535,
       "inflow_max": 157.594,
       "format": "15 Harian"
     },
@@ -1373,16 +1373,16 @@
       "format": "10 Harian"
     },
     "BD197": {
-      "tma_min": 565.583,
+      "tma_min": 565.5,
       "tma_max": 569.507,
-      "inflow_min": 0.075,
+      "inflow_min": 0.056,
       "inflow_max": 13.63,
       "format": "15 Harian"
     },
     "BD198": {
-      "tma_min": 91.484,
+      "tma_min": 91.3,
       "tma_max": 93.579,
-      "inflow_min": 0.014,
+      "inflow_min": 0.01,
       "inflow_max": 0.209,
       "format": "10 Harian"
     },
@@ -1401,35 +1401,35 @@
       "format": "15 Harian"
     },
     "BD202": {
-      "tma_min": 35.685,
+      "tma_min": 34.75,
       "tma_max": 39.038,
       "inflow_min": 0.0,
       "inflow_max": 1.706,
       "format": "15 Harian"
     },
     "BD203": {
-      "tma_min": 141.504,
+      "tma_min": 139.997,
       "tma_max": 149.774,
-      "inflow_min": 0.209,
+      "inflow_min": 0.27,
       "inflow_max": 15.383,
       "format": "15 Harian"
     },
     "BD204": {
-      "tma_min": 8.454,
+      "tma_min": 7.701,
       "tma_max": 10.44,
-      "inflow_min": 0.174,
+      "inflow_min": 0.11,
       "inflow_max": 13.785,
       "format": "15 Harian"
     },
     "BD205": {
-      "tma_min": 13.053,
+      "tma_min": 12.749,
       "tma_max": 15.231,
       "inflow_min": 0.0,
       "inflow_max": 21.0,
       "format": "15 Harian"
     },
     "BD206": {
-      "tma_min": 19.688,
+      "tma_min": 19.24,
       "tma_max": 21.588,
       "inflow_min": 0.0,
       "inflow_max": 2.041,
@@ -1443,23 +1443,23 @@
       "format": "15 Harian"
     },
     "BD208": {
-      "tma_min": 89.482,
+      "tma_min": 89.257,
       "tma_max": 97.461,
-      "inflow_min": 1.34,
+      "inflow_min": 0.703,
       "inflow_max": 51.082,
       "format": "15 Harian"
     },
     "BD209": {
       "tma_min": 88.45,
       "tma_max": 88.979,
-      "inflow_min": 0.005,
+      "inflow_min": 0.003,
       "inflow_max": 0.323,
       "format": "15 Harian"
     },
     "BD210": {
       "tma_min": 14.536,
       "tma_max": 14.883,
-      "inflow_min": 0.024,
+      "inflow_min": 0.022,
       "inflow_max": 0.144,
       "format": "15 Harian"
     },
@@ -1471,7 +1471,7 @@
       "format": "15 Harian"
     },
     "BD212": {
-      "tma_min": 16.121,
+      "tma_min": 15.823,
       "tma_max": 19.709,
       "inflow_min": 0.0,
       "inflow_max": 3.58,
@@ -1490,7 +1490,7 @@
     "10 Harian": 15
   },
   "val_mae": {
-    "15 Harian": 0.05452967807650566,
-    "10 Harian": 0.06766972690820694
+    "15 Harian": 0.0580797903239727,
+    "10 Harian": 0.0700499638915062
   }
 }
