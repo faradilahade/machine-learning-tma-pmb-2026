@@ -93,6 +93,10 @@ def tema(fig, h):
 
 
 pred, acc, ev, hist, ref, sm = muat()
+# BON A, BON B, dan RTOW per periode dari workbook RTOW periodik (sama dengan dashboard DDEWOMS)
+for k_ in ("bon_a", "bon_b", "rtow"):
+    pred[k_] = pred.periode.map(ref[k_])
+pred["status_bon"] = np.where(pred.tma >= pred.bon_a, A_, np.where(pred.tma >= pred.bon_b, AB_, B_))
 urut = list(pred.periode)
 xl = [pl(p) for p in urut]
 real, fc = pred[pred.jenis == "realisasi"], pred[pred.jenis == "prediksi"]
@@ -115,17 +119,17 @@ with tab1:
     fig = go.Figure()
     if show25:
         h = hist[hist.tanggal.dt.year == 2025].set_index("periode").tma.reindex(urut)
-        fig.add_trace(go.Scatter(x=xl, y=h.values, name="TMA 2025", line=dict(color=C["thn"], width=2), opacity=.8))
-    fig.add_trace(go.Scatter(x=xl, y=pred.rtow, name="RTOW rencana operasi", line=dict(color=C["rtow"], width=2, dash="dot")))
-    fig.add_trace(go.Scatter(x=xl, y=pred.bon_a, name="BON A", line=dict(color=C["bona"], width=2.5, dash="dashdot")))
-    fig.add_trace(go.Scatter(x=xl, y=pred.bon_b, name="BON B", line=dict(color=C["bonb"], width=2.5, dash="dashdot")))
+        fig.add_trace(go.Scatter(x=xl, y=h.values, name="TMA 2025", line=dict(color=C["thn"], width=2, shape="spline", smoothing=0.6), opacity=.8))
+    fig.add_trace(go.Scatter(x=xl, y=pred.rtow, name="RTOW rencana operasi", line=dict(color=C["rtow"], width=2.5, dash="dot", shape="spline", smoothing=0.6)))
+    fig.add_trace(go.Scatter(x=xl, y=pred.bon_a, name="BON A", line=dict(color=C["bona"], width=2.5, dash="dashdot", shape="spline", smoothing=0.6)))
+    fig.add_trace(go.Scatter(x=xl, y=pred.bon_b, name="BON B", line=dict(color=C["bonb"], width=2.5, dash="dashdot", shape="spline", smoothing=0.6)))
     fig.add_trace(go.Scatter(x=xl, y=[ref["kekeringan"]] * len(xl), name="Elevasi kekeringan RTOW",
                              line=dict(color=C["kering"], width=2, dash="longdash")))
     fig.add_trace(go.Scatter(x=xl, y=[ref["dasar"]] * len(xl), name="Elevasi dasar waduk",
                              line=dict(color=C["dasar"], width=1.5, dash="longdashdot")))
     xr = [pl(p) for p in real.periode]
     fig.add_trace(go.Scatter(x=xr, y=real.tma, name="TMA realisasi 2026", mode="lines+markers",
-                             line=dict(color=C["real"], width=4), marker=dict(size=7)))
+                             line=dict(color=C["real"], width=4, shape="spline", smoothing=0.6), marker=dict(size=7)))
     xp = [xr[-1]] + [pl(p) for p in fc.periode]
     yp = [tma_now] + list(fc.tma)
     if showband:
@@ -133,7 +137,7 @@ with tab1:
       fig.add_trace(go.Scatter(x=xp, y=np.array(yp) - mae, line=dict(width=0), fill="tonexty", fillcolor="rgba(163,230,53,.18)",
                              name=f"Pita galat historis ± {f(mae)} m", hoverinfo="skip"))
     fig.add_trace(go.Scatter(x=xp, y=yp, name="TMA prediksi LSTM", mode="lines+markers",
-                             line=dict(color=C["pred"], width=4, dash="dash"),
+                             line=dict(color=C["pred"], width=4, dash="dash", shape="spline", smoothing=0.6),
                              marker=dict(size=11, symbol="circle", line=dict(color="#06121c", width=2))))
     krit = fc[fc.status_bon == B_]
     if len(krit):

@@ -17,5 +17,6 @@ ek = pd.read_excel(X, sheet_name="elevasi_kekeringan")
 ek = ek[ek.nama_bendungan == N].iloc[0]
 out = {"ketersediaan": baris("ketersediaan_air_10"), "kebutuhan": baris("kebutuhan_air_10"),
        "kekeringan": float(ek.elevasi_kekeringan_rtow), "dasar": float(ek.elevasi_dasar_waduk_rtow),
-       "intake": float(ek.elevasi_dasar_intake_sinbad)}
+       "intake": float(ek.elevasi_dasar_intake_sinbad),
+       "bon_a": baris("bon_a_10"), "bon_b": baris("bon_b_10"), "rtow": baris("rtow_10")}
 json.dump(out, open("data_gongseng/ref_gongseng.json", "w"), indent=1)
