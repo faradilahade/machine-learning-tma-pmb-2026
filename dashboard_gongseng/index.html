@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard TMA Bendungan Gongseng</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06121c;--bg2:#0a1f2e;--card:#0d2638;--card2:#11324a;--line:#1f4560;--tx:#eaf6fb;--mut:#8fb3c7;--cy:#22d3ee;--lime:#a3e635;--amb:#fbbf24;--ros:#fb7185;--vio:#a78bfa;--tl:#14b8a6;--org:#fb923c;--ok:#34d399}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(1200px 600px at 80% -10%,#0f4c5c55,transparent),radial-gradient(900px 500px at -10% 10%,#1d4ed833,transparent),var(--bg);color:var(--tx);font:500 15px/1.45 'Plus Jakarta Sans',system-ui,sans-serif;min-height:100vh}
+.wrap{max-width:1440px;margin:0 auto;padding:16px}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--tl),#0891b2);display:grid;place-items:center;box-shadow:0 0 24px #14b8a688}
+.logo svg{width:28px;height:28px}
+h1{font-size:22px;font-weight:800;letter-spacing:.2px;line-height:1.2}
+.sub{color:var(--mut);font-size:13px;font-weight:600}
+.sp{flex:1}
+.live{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--ok);animation:blink 1.6s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 0 0 #34d39988}50%{opacity:.5;box-shadow:0 0 0 8px #34d39900}}
+.mono{font-family:'JetBrains Mono',monospace}
+.banner{border-radius:16px;padding:14px 18px;display:flex;gap:14px;align-items:center;margin-bottom:12px;border:1px solid;font-size:15px}
+.banner b{font-size:17px;font-weight:800}
+.banner .ic{font-size:28px}
+.b-ok{background:linear-gradient(90deg,#064e3b99,#0d2638);border-color:#34d39966}
+.b-warn{background:linear-gradient(90deg,#78350f99,#0d2638);border-color:#fbbf2477}
+.b-bad{background:linear-gradient(90deg,#7f1d1d99,#0d2638);border-color:#fb718588}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+.card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:16px;position:relative;overflow:hidden}
+.kpi{grid-column:span 3;transition:transform .2s,border-color .2s}
+.kpi:hover{transform:translateY(-3px);border-color:var(--cy)}
+.kpi .l{color:var(--mut);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+.kpi .v{font-size:32px;font-weight:800;margin:4px 0 2px;font-family:'JetBrains Mono',monospace}
+.kpi .v small{font-size:15px;color:var(--mut);font-weight:600}
+.kpi .n{font-size:13px;color:var(--mut)}
+.kpi::after{content:"";position:absolute;right:-30px;top:-30px;width:100px;height:100px;border-radius:50%;background:var(--c,var(--cy));opacity:.13}
+.h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.h h2{font-size:17px;font-weight:800}
+.h .d{font-size:13px;color:var(--mut)}
+.tabs{display:flex;background:#06121c;border:1px solid var(--line);border-radius:999px;padding:3px}
+.tabs button{border:0;background:none;color:var(--mut);font:700 13px 'Plus Jakarta Sans';padding:6px 14px;border-radius:999px;cursor:pointer}
+.tabs button.on{background:linear-gradient(135deg,var(--tl),#0891b2);color:#fff}
+.leg{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 6px}
+.chip{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:#06121c;cursor:pointer;user-select:none;transition:opacity .2s}
+.chip i{width:18px;height:4px;border-radius:2px;display:block}
+.chip.off{opacity:.35}
+.cv{position:relative;width:100%}
+svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{font-family:'Plus Jakarta Sans',sans-serif;fill:var(--mut);font-size:12px;font-weight:600}
+.tip{position:absolute;pointer-events:none;background:#04101a;border:1px solid var(--cy);border-radius:12px;padding:10px 12px;font-size:13px;min-width:190px;box-shadow:0 10px 30px #000a;opacity:0;transition:opacity .12s;z-index:5}
+.tip b{display:block;margin-bottom:5px;font-size:14px}
+.tip div{display:flex;justify-content:space-between;gap:14px}
+.tip span.s{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px}
+.pr{transform-box:fill-box;transform-origin:center;animation:pulse 2s ease-in-out infinite}
+.ring{transform-box:fill-box;transform-origin:center;animation:ring 2s ease-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
+@keyframes ring{0%{transform:scale(.6);opacity:.8}100%{transform:scale(3.2);opacity:0}}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.6px;padding:6px 8px;font-weight:700}
+td{padding:9px 8px;border-top:1px solid var(--line)}
+tr.row{cursor:pointer;transition:background .15s}tr.row:hover{background:#ffffff0d}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800}
+.s-ok{background:#064e3b;color:#6ee7b7}.s-w{background:#78350f;color:#fcd34d}.s-b{background:#7f1d1d;color:#fecaca}
+.bar{height:10px;border-radius:6px;background:#06121c;overflow:hidden}.bar>i{display:block;height:100%;border-radius:6px;transition:width .8s}
+.mrow{display:grid;grid-template-columns:130px 1fr 64px;gap:10px;align-items:center;margin:9px 0;font-size:14px}
+.mrow.me{font-weight:800}
+select{background:#06121c;color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font:700 13px 'Plus Jakarta Sans'}
+.note{font-size:13px;color:var(--mut);margin-top:8px}
+footer{margin-top:16px;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;color:var(--mut);font-size:13px;padding:12px 4px;border-top:1px solid var(--line)}
+footer b{color:var(--tx)}
+.c8{grid-column:span 8}.c7{grid-column:span 7}.c6{grid-column:span 6}.c5{grid-column:span 5}.c4{grid-column:span 4}.c12{grid-column:span 12}
+@media(max-width:1000px){.kpi{grid-column:span 6}.c8,.c7,.c6,.c5,.c4{grid-column:span 12}}
+@media(max-width:560px){.kpi{grid-column:span 12}h1{font-size:18px}.mrow{grid-template-columns:100px 1fr 56px}}
+</style></head><body><div class="wrap">
+<header>
+ <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M3 9c3 0 3 2 6 2s3-2 6-2 3 2 6 2M3 15c3 0 3 2 6 2s3-2 6-2 3 2 6 2"/></svg></div>
+ <div><h1>Bendungan Gongseng · Prediksi Adaptif Tinggi Muka Air</h1>
+ <div class="sub">LSTM Encoder Decoder untuk Mitigasi Kekeringan El Nino · BBWS Bengawan Solo</div></div>
+ <div class="sp"></div>
+ <div class="live"><span class="dot"></span><span>Data terakhir <span class="mono" id="upd"></span></span></div>
+</header>
+<div id="banner"></div>
+<div class="grid">
+ <div class="card kpi" style="--c:var(--cy)"><div class="l">TMA terakhir</div><div class="v" id="k1"></div><div class="n" id="k1n"></div></div>
+ <div class="card kpi" style="--c:var(--amb)"><div class="l">Status BON saat ini</div><div class="v" id="k2" style="font-size:20px;line-height:1.3;padding:8px 0;font-family:inherit"></div><div class="n" id="k2n"></div></div>
+ <div class="card kpi" style="--c:var(--ros)"><div class="l">Jarak ke elevasi kekeringan</div><div class="v" id="k3"></div><div class="n" id="k3n"></div></div>
+ <div class="card kpi" style="--c:var(--lime)"><div class="l">Prediksi akhir tahun</div><div class="v" id="k4"></div><div class="n" id="k4n"></div></div>
+
+ <div class="card c12">
+  <div class="h"><h2>Pemantauan dan prediksi TMA 2026</h2><span class="d">Klik legenda untuk menyembunyikan garis. Arahkan kursor untuk detail.</span><span class="sp"></span>
+   <div class="tabs" id="tabs"><button class="on" data-m="p">Per 10 harian</button><button data-m="h">Harian</button></div></div>
+  <div class="leg" id="leg"></div>
+  <div class="cv" id="main"></div>
+ </div>
+
+ <div class="card c7">
+  <div class="h"><h2>Prediksi periode ke depan</h2><span class="d">Klik baris untuk menyorot di grafik</span></div>
+  <div style="overflow-x:auto"><table id="tbl"></table></div>
+ </div>
+ <div class="card c5">
+  <div class="h"><h2>Akurasi model</h2><span class="sp"></span><select id="sel"></select></div>
+  <div class="d" style="font-size:13px;color:var(--mut)">Rata rata galat absolut (meter). Makin pendek makin akurat.</div>
+  <div id="acc"></div><div class="note" id="accn"></div>
+ </div>
+
+ <div class="card c6">
+  <div class="h"><h2>Neraca air</h2><span class="d">Ketersediaan dan kebutuhan air (m³/detik)</span></div>
+  <div class="leg" id="leg2"></div><div class="cv" id="nera"></div><div class="note" id="neran"></div>
+ </div>
+ <div class="card c6">
+  <div class="h"><h2>Konteks tahun kering</h2><span class="d">TMA 2026 dibanding tahun sebelumnya</span></div>
+  <div class="leg" id="leg3"></div><div class="cv" id="ctx"></div><div class="note" id="ctxn"></div>
+ </div>
+</div>
+<footer><div>Created by <b>Faradilah Ade</b> · Internal system of Pusat Monitoring Bendungan</div>
+<div>Sumber data SINBAD · Model LSTM Encoder Decoder · Satuan TMA meter di atas muka laut</div></footer>
+</div>
+<script>
+const D={"per":[{"l":"01-01","t":"2026-01-01","tma":92.994,"j":"realisasi","a":93.0,"b":90.844,"r":91.671,"s":"Di antara BON A dan BON B"},{"l":"01-02","t":"2026-01-11","tma":93.126,"j":"realisasi","a":93.0,"b":90.844,"r":91.671,"s":"Di atas BON A"},{"l":"01-03","t":"2026-01-21","tma":93.058,"j":"realisasi","a":93.0,"b":90.844,"r":91.671,"s":"Di atas BON A"},{"l":"02-01","t":"2026-02-01","tma":93.134,"j":"realisasi","a":93.0,"b":90.482,"r":93.0,"s":"Di atas BON A"},{"l":"02-02","t":"2026-02-11","tma":93.114,"j":"realisasi","a":93.0,"b":90.482,"r":93.0,"s":"Di atas BON A"},{"l":"02-03","t":"2026-02-21","tma":93.22,"j":"realisasi","a":93.0,"b":90.482,"r":93.0,"s":"Di atas BON A"},{"l":"03-01","t":"2026-03-01","tma":93.124,"j":"realisasi","a":93.0,"b":90.374,"r":93.0,"s":"Di atas BON A"},{"l":"03-02","t":"2026-03-11","tma":93.154,"j":"realisasi","a":93.0,"b":90.374,"r":93.0,"s":"Di atas BON A"},{"l":"03-03","t":"2026-03-21","tma":93.198,"j":"realisasi","a":93.0,"b":90.374,"r":93.0,"s":"Di atas BON A"},{"l":"04-01","t":"2026-04-01","tma":93.239,"j":"realisasi","a":93.0,"b":91.404,"r":92.837,"s":"Di atas BON A"},{"l":"04-02","t":"2026-04-11","tma":93.18,"j":"realisasi","a":93.0,"b":91.404,"r":92.837,"s":"Di atas BON A"},{"l":"04-03","t":"2026-04-21","tma":93.139,"j":"realisasi","a":93.0,"b":91.404,"r":92.837,"s":"Di atas BON A"},{"l":"05-01","t":"2026-05-01","tma":93.164,"j":"realisasi","a":92.928,"b":89.931,"r":87.06,"s":"Di atas BON A"},{"l":"05-02","t":"2026-05-11","tma":92.404,"j":"realisasi","a":92.928,"b":89.931,"r":87.06,"s":"Di antara BON A dan BON B"},{"l":"05-03","t":"2026-05-21","tma":90.817,"j":"realisasi","a":92.928,"b":89.931,"r":87.06,"s":"Di antara BON A dan BON B"},{"l":"06-01","t":"2026-06-01","tma":89.662,"j":"realisasi","a":92.535,"b":89.394,"r":86.0,"s":"Di antara BON A dan BON B"},{"l":"06-02","t":"2026-06-11","tma":89.63,"j":"realisasi","a":92.535,"b":89.394,"r":86.0,"s":"Di antara BON A dan BON B"},{"l":"06-03","t":"2026-06-21","tma":89.625,"j":"realisasi","a":92.535,"b":89.394,"r":86.0,"s":"Di antara BON A dan BON B"},{"l":"07-01","t":"2026-07-01","tma":89.618,"j":"realisasi","a":91.889,"b":88.419,"r":86.0,"s":"Di antara BON A dan BON B"},{"l":"07-02","t":"2026-07-11","tma":89.605,"j":"realisasi","a":91.889,"b":88.419,"r":86.0,"s":"Di antara BON A dan BON B"},{"l":"07-03","t":"2026-07-21","tma":89.586,"j":"realisasi","a":91.889,"b":88.419,"r":86.0,"s":"Di antara BON A dan BON B"},{"l":"08-01","t":"2026-08-01","tma":89.533,"j":"realisasi","a":91.227,"b":87.211,"r":86.0,"s":"Di antara BON A dan BON B"},{"l":"08-02","t":"2026-08-11","tma":89.428,"j":"realisasi","a":91.227,"b":87.211,"r":86.0,"s":"Di antara BON A dan BON B"},{"l":"08-03","t":"2026-08-21","tma":89.143,"j":"realisasi","a":91.227,"b":87.211,"r":86.0,"s":"Di antara BON A dan BON B"},{"l":"09-01","t":"2026-09-01","tma":89.071,"j":"realisasi","a":90.744,"b":86.809,"r":86.0,"s":"Di antara BON A dan BON B"},{"l":"09-02","t":"2026-09-11","tma":88.586,"j":"realisasi","a":90.744,"b":86.809,"r":86.0,"s":"Di antara BON A dan BON B"},{"l":"09-03","t":"2026-09-21","tma":87.527,"j":"realisasi","a":90.744,"b":86.809,"r":86.0,"s":"Di antara BON A dan BON B"},{"l":"10-01","t":"2026-10-01","tma":87.381,"j":"realisasi","a":90.563,"b":86.369,"r":86.0,"s":"Di antara BON A dan BON B"},{"l":"10-02","t":"2026-10-11","tma":87.207,"j":"realisasi","a":90.563,"b":86.369,"r":86.0,"s":"Di antara BON A dan BON B"},{"l":"10-03","t":"2026-10-21","tma":87.024,"j":"realisasi","a":90.563,"b":86.369,"r":86.0,"s":"Di antara BON A dan BON B"},{"l":"11-01","t":"2026-11-01","tma":87.362,"j":"prediksi","a":91.867,"b":86.798,"r":93.0,"s":"Di antara BON A dan BON B"},{"l":"11-02","t":"2026-11-11","tma":87.576,"j":"prediksi","a":91.867,"b":86.798,"r":93.0,"s":"Di antara BON A dan BON B"},{"l":"11-03","t":"2026-11-21","tma":88.62,"j":"prediksi","a":91.867,"b":86.798,"r":93.0,"s":"Di antara BON A dan BON B"},{"l":"12-01","t":"2026-12-01","tma":89.744,"j":"prediksi","a":93.0,"b":89.323,"r":93.0,"s":"Di antara BON A dan BON B"},{"l":"12-02","t":"2026-12-11","tma":90.779,"j":"prediksi","a":93.0,"b":89.323,"r":93.0,"s":"Di antara BON A dan BON B"},{"l":"12-03","t":"2026-12-21","tma":91.766,"j":"prediksi","a":93.0,"b":89.323,"r":93.0,"s":"Di antara BON A dan BON B"}],"kb":[0.205,0.205,0.205,0.205,0.205,0.205,0.205,0.205,0.205,0.205,0.205,0.205,5.3,6.574,1.419,1.112,1.468,0.205,1.954,1.232,1.071,1.088,0.205,0.205,0.205,0.205,0.205,0.205,0.205,0.205,0.205,0.205,0.205,0.205,0.205,0.205],"kt":[3.929,3.85,5.543,8.013,12.277,10.814,14.342,10.514,6.81,9.877,6.583,4.175,3.029,3.168,1.682,1.015,0.725,0.285,0.255,0.245,0.164,0.175,0.31,0.259,0.215,0.14,0.17,0.31,0.42,1.545,2.525,2.925,3.715,4.7,4.756,4.395],"ek":{"intake":70.0,"kering":86.0,"dasar":86.0},"cl":null,"yrs":{"2024":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,87.523,88.246,89.494,90.475],"2025":[91.802,93.067,93.201,93.028,93.065,93.294,93.278,93.166,93.117,93.249,93.187,93.144,93.077,93.34,93.185,93.1,93.149,93.072,93.051,93.014,92.998,92.983,92.98,92.98,92.703,91.454,91.328,90.93,90.683,91.1,91.813,92.814,92.944,91.927,91.187,92.09]},"harian":[["2026-01-01",92.86],["2026-01-02",92.88],["2026-01-03",92.88],["2026-01-04",92.88],["2026-01-05",93.01],["2026-01-06",93.02],["2026-01-07",93.02],["2026-01-08",93.02],["2026-01-09",93.2],["2026-01-10",93.17],["2026-01-11",93.14],["2026-01-12",93.15],["2026-01-13",93.18],["2026-01-14",93.21],["2026-01-15",93.14],["2026-01-16",93.09],["2026-01-17",93.09],["2026-01-18",93.09],["2026-01-19",93.09],["2026-01-20",93.084],["2026-01-21",93.079],["2026-01-22",93.073],["2026-01-23",93.067],["2026-01-24",93.061],["2026-01-25",93.056],["2026-01-26",93.05],["2026-01-27",93.05],["2026-01-28",93.05],["2026-01-29",93.05],["2026-01-30",93.05],["2026-01-31",93.05],["2026-02-01",93.05],["2026-02-02",93.01],["2026-02-03",93.0],["2026-02-04",93.07],["2026-02-05",93.475],["2026-02-06",93.31],["2026-02-07",93.21],["2026-02-08",93.17],["2026-02-09",93.05],["2026-02-10",93.0],["2026-02-11",93.0],["2026-02-12",93.075],["2026-02-13",93.19],["2026-02-14",93.19],["2026-02-15",93.15],["2026-02-16",93.12],["2026-02-17",93.09],["2026-02-18",93.09],["2026-02-19",93.09],["2026-02-20",93.14],["2026-02-21",93.18],["2026-02-22",93.22],["2026-02-23",93.2],["2026-02-24",93.27],["2026-02-25",93.34],["2026-02-26",93.26],["2026-02-27",93.17],["2026-02-28",93.12],["2026-03-01",93.11],["2026-03-02",93.1],["2026-03-03",93.21],["2026-03-04",93.17],["2026-03-05",93.13],["2026-03-06",93.13],["2026-03-07",93.11],["2026-03-08",93.11],["2026-03-09",93.09],["2026-03-10",93.08],["2026-03-11",93.1],["2026-03-12",93.1],["2026-03-13",93.065],["2026-03-14",92.97],["2026-03-15",92.9],["2026-03-16",93.2],["2026-03-17",93.49],["2026-03-18",93.38],["2026-03-19",93.2],["2026-03-20",93.13],["2026-03-21",93.13],["2026-03-22",93.1],["2026-03-23",93.03],["2026-03-24",93.0],["2026-03-25",93.13],["2026-03-26",93.15],["2026-03-27",93.35],["2026-03-28",93.32],["2026-03-29",93.27],["2026-03-30",93.2],["2026-03-31",93.5],["2026-04-01",93.29],["2026-04-02",93.18],["2026-04-03",93.32],["2026-04-04",93.21],["2026-04-05",93.2],["2026-04-06",93.16],["2026-04-07",93.28],["2026-04-08",93.29],["2026-04-09",93.29],["2026-04-10",93.17],["2026-04-11",93.2],["2026-04-12",93.18],["2026-04-13",93.31],["2026-04-14",93.21],["2026-04-15",93.18],["2026-04-16",93.18],["2026-04-17",93.15],["2026-04-18",93.14],["2026-04-19",93.14],["2026-04-20",93.11],["2026-04-21",93.1],["2026-04-22",93.1],["2026-04-23",93.16],["2026-04-24",93.15],["2026-04-25",93.13],["2026-04-26",93.1],["2026-04-27",93.13],["2026-04-28",93.2],["2026-04-29",93.18],["2026-04-30",93.14],["2026-05-01",93.22],["2026-05-02",93.18],["2026-05-03",93.16],["2026-05-04",93.16],["2026-05-05",93.19],["2026-05-06",93.19],["2026-05-07",93.16],["2026-05-08",93.14],["2026-05-09",93.13],["2026-05-10",93.11],["2026-05-11",93.08],["2026-05-12",93.05],["2026-05-13",92.98],["2026-05-14",92.28],["2026-05-15",92.59],["2026-05-16",92.375],["2026-05-17",92.22],["2026-05-18",92.04],["2026-05-19",91.83],["2026-05-20",91.595],["2026-05-21",92.057],["2026-05-22",91.223],["2026-05-23",91.015],["2026-05-24",91.263],["2026-05-25",90.873],["2026-05-26",90.78],["2026-05-27",90.68],["2026-05-28",90.515],["2026-05-29",90.36],["2026-05-30",90.21],["2026-05-31",90.005],["2026-06-01",89.825],["2026-06-02",89.66],["2026-06-03",89.65],["2026-06-04",89.65],["2026-06-05",89.64],["2026-06-06",89.64],["2026-06-07",89.64],["2026-06-08",89.64],["2026-06-09",89.64],["2026-06-10",89.635],["2026-06-11",89.63],["2026-06-12",89.63],["2026-06-13",89.63],["2026-06-14",89.63],["2026-06-15",89.63],["2026-06-16",89.63],["2026-06-17",89.63],["2026-06-18",89.63],["2026-06-19",89.63],["2026-06-20",89.63],["2026-06-21",89.63],["2026-06-22",89.63],["2026-06-23",89.63],["2026-06-24",89.63],["2026-06-25",89.63],["2026-06-26",89.62],["2026-06-27",89.62],["2026-06-28",89.62],["2026-06-29",89.62],["2026-06-30",89.62],["2026-07-01",89.62],["2026-07-02",89.62],["2026-07-03",89.62],["2026-07-04",89.62],["2026-07-05",89.62],["2026-07-06",89.62],["2026-07-07",89.62],["2026-07-08",89.62],["2026-07-09",89.613],["2026-07-10",89.61],["2026-07-11",89.61],["2026-07-12",89.61],["2026-07-13",89.61],["2026-07-14",89.61],["2026-07-15",89.61],["2026-07-16",89.6],["2026-07-17",89.6],["2026-07-18",89.6],["2026-07-19",89.6],["2026-07-20",89.6],["2026-07-21",89.6],["2026-07-22",89.6],["2026-07-23",89.6],["2026-07-24",89.59],["2026-07-25",89.59],["2026-07-26",89.58],["2026-07-27",89.58],["2026-07-28",89.58],["2026-07-29",89.58],["2026-07-30",89.58],["2026-07-31",89.57],["2026-08-01",89.57],["2026-08-02",89.56],["2026-08-03",89.56],["2026-08-04",89.55],["2026-08-05",89.54],["2026-08-06",89.53],["2026-08-07",89.52],["2026-08-08",89.51],["2026-08-09",89.5],["2026-08-10",89.49],["2026-08-11",89.48],["2026-08-12",89.47],["2026-08-13",89.46],["2026-08-14",89.45],["2026-08-15",89.44],["2026-08-16",89.43],["2026-08-17",89.42],["2026-08-18",89.397],["2026-08-19",89.377],["2026-08-20",89.36],["2026-08-21",89.35],["2026-08-22",89.34],["2026-08-23",89.33],["2026-08-24",89.32],["2026-08-25",87.8],["2026-08-26",89.285],["2026-08-27",89.267],["2026-08-28",89.247],["2026-08-29",89.227],["2026-08-30",89.215],["2026-08-31",89.197],["2026-09-01",89.175],["2026-09-02",89.155],["2026-09-03",89.14],["2026-09-04",89.117],["2026-09-05",89.087],["2026-09-06",89.055],["2026-09-07",89.027],["2026-09-08",88.997],["2026-09-09",88.98],["2026-09-10",88.98],["2026-09-11",88.97],["2026-09-12",88.97],["2026-09-13",88.97],["2026-09-14",88.937],["2026-09-15",88.78],["2026-09-16",88.6],["2026-09-17",88.423],["2026-09-18",88.245],["2026-09-19",88.077],["2026-09-20",87.887],["2026-09-21",87.685],["2026-09-22",87.533],["2026-09-23",87.54],["2026-09-24",87.54],["2026-09-25",87.53],["2026-09-26",87.53],["2026-09-27",87.505],["2026-09-28",87.487],["2026-09-29",87.467],["2026-09-30",87.45],["2026-10-01",87.44],["2026-10-02",87.43],["2026-10-03",87.42],["2026-10-04",87.4],["2026-10-05",87.44],["2026-10-06",87.37],["2026-10-07",87.35],["2026-10-08",87.34],["2026-10-09",87.317],["2026-10-10",87.3],["2026-10-11",87.29],["2026-10-12",87.277],["2026-10-13",87.257],["2026-10-14",87.237],["2026-10-15",87.217],["2026-10-16",87.2],["2026-10-17",87.18],["2026-10-18",87.157],["2026-10-19",87.137],["2026-10-20",87.117],["2026-10-21",87.097],["2026-10-22",87.077],["2026-10-23",87.057],["2026-10-24",87.04],["2026-10-25",87.03],["2026-10-26",87.02],["2026-10-27",87.0],["2026-10-28",86.99],["2026-10-29",86.99],["2026-10-30",86.98],["2026-10-31",86.98],["2026-11-01",86.98],["2026-11-02",86.98],["2026-11-03",86.98]],"acc":[{"l":"08-01","t":"2026-08-01","p":89.779,"o":89.533,"e":0.246,"ok":true},{"l":"08-02","t":"2026-08-11","p":89.784,"o":89.428,"e":0.356,"ok":true},{"l":"08-03","t":"2026-08-21","p":89.731,"o":89.143,"e":0.588,"ok":true},{"l":"09-01","t":"2026-09-01","p":89.786,"o":89.071,"e":0.715,"ok":true},{"l":"09-02","t":"2026-09-11","p":89.949,"o":88.586,"e":1.363,"ok":true},{"l":"09-03","t":"2026-09-21","p":90.194,"o":87.527,"e":2.667,"ok":true},{"l":"10-01","t":"2026-10-01","p":90.489,"o":87.381,"e":3.108,"ok":true},{"l":"10-02","t":"2026-10-11","p":90.807,"o":87.207,"e":3.6,"ok":false},{"l":"10-03","t":"2026-10-21","p":91.121,"o":87.024,"e":4.097,"ok":false},{"l":"09-01","t":"2026-09-01","p":88.784,"o":89.071,"e":-0.287,"ok":true},{"l":"09-02","t":"2026-09-11","p":88.728,"o":88.586,"e":0.142,"ok":true},{"l":"09-03","t":"2026-09-21","p":88.689,"o":87.527,"e":1.162,"ok":true},{"l":"10-01","t":"2026-10-01","p":88.712,"o":87.381,"e":1.331,"ok":true},{"l":"10-02","t":"2026-10-11","p":88.866,"o":87.207,"e":1.659,"ok":true},{"l":"10-03","t":"2026-10-21","p":89.158,"o":87.024,"e":2.134,"ok":true},{"l":"10-01","t":"2026-10-01","p":88.497,"o":87.381,"e":1.116,"ok":true},{"l":"10-02","t":"2026-10-11","p":88.321,"o":87.207,"e":1.114,"ok":true},{"l":"10-03","t":"2026-10-21","p":88.471,"o":87.024,"e":1.447,"ok":true}],"ev":[["Agu-Des 2025","Klimatologi",4.421],["Agu-Des 2025","LSTM (produksi)",0.606],["Agu-Des 2025","Naif musiman",4.097],["Agu-Des 2025","Persistensi",1.004],["Agu-Des 2025","Tren linier",0.894],["Mar-Jul 2026","Klimatologi",3.32],["Mar-Jul 2026","LSTM (produksi)",0.604],["Mar-Jul 2026","Naif musiman",1.621],["Mar-Jul 2026","Persistensi",1.68],["Mar-Jul 2026","Tren linier",2.58]],"upd":"2026-11-03"};
+const $=s=>document.getElementById(s),NS="http://www.w3.org/2000/svg";
+const BL=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"],RM=["I","II","III"];
+const f=(v,d=2)=>v==null?"tidak ada data":v.toLocaleString("id-ID",{minimumFractionDigits:d,maximumFractionDigits:d});
+const pl=l=>BL[+l.slice(0,2)-1]+" "+RM[+l.slice(3)-1];
+const fd=t=>{const d=new Date(t);return d.getDate()+" "+BL[d.getMonth()]+" "+d.getFullYear()};
+const P=D.per,N=P.length,EK=D.ek.kering;
+const lastH=D.harian[D.harian.length-1],cur=lastH[1];
+const fi=P.findIndex(r=>r.j=="prediksi"),lastR=P[fi-1];
+// status saat ini terhadap BON periode berjalan
+const now=new Date(lastH[0]),pi=Math.min(N-1,now.getMonth()*3+(now.getDate()<=10?0:now.getDate()<=20?1:2)),cp=P[pi];
+const stat=(v,r)=>v>=r.a?0:v>=r.b?1:2;
+const SN=["Di atas BON A","Di antara BON A dan BON B","Di bawah BON B"],SC=["s-ok","s-w","s-b"];
+const st=stat(cur,cp);
+$("upd").textContent=fd(D.upd);
+$("k1").innerHTML=f(cur,2)+"<small> m</small>";$("k1n").textContent="Pembacaan "+fd(lastH[0]);
+$("k2").textContent=SN[st];$("k2n").textContent="BON A "+f(cp.a)+" m, BON B "+f(cp.b)+" m";
+const jr=cur-EK;$("k3").innerHTML=f(Math.abs(jr),2)+"<small> m</small>";
+$("k3n").textContent=(jr>=0?"Di atas":"Di bawah")+" elevasi kekeringan "+f(EK,2)+" m";
+const end=P[N-1],mn=P.slice(fi).reduce((a,b)=>b.tma<a.tma?b:a);
+$("k4").innerHTML=f(end.tma,2)+"<small> m</small>";$("k4n").textContent="Titik terendah prediksi "+f(mn.tma,2)+" m pada "+pl(mn.l);
+const B=[["b-ok","✔","Kondisi aman","TMA berada di atas BON A. Pantau rutin sesuai jadwal dan pertahankan pola operasi."],
+["b-warn","⚠","Waspada kekeringan","TMA di antara BON A dan BON B. Hemat pelepasan, prioritaskan kebutuhan pokok, laporkan pembacaan setiap hari."],
+["b-bad","⛔","Siaga kekeringan","TMA di bawah BON B. Segera lapor ke koordinator dan terapkan pembatasan pelepasan air."]][st];
+$("banner").innerHTML=`<div class="banner ${B[0]}"><span class="ic">${B[1]}</span><div><b>${B[2]}</b><br>${B[3]} Prediksi ${pl(mn.l)} turun ke ${f(mn.tma,2)} m, ${f(mn.tma-EK,2)} m di atas elevasi kekeringan.</div></div>`;
+
+// ===== chart engine =====
+const tip=(host)=>{let t=document.createElement("div");t.className="tip";host.appendChild(t);return t};
+function mk(n,a,p){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);p&&p.appendChild(e);return e}
+function chart(host,c){
+ host.innerHTML="";const W=c.w||1000,H=c.h||380,m={l:58,r:18,t:14,b:34};
+ const svg=mk("svg",{viewBox:`0 0 ${W} ${H}`},host),T=tip(host);
+ const vis=c.series.filter(s=>!s.off);let lo=1e9,hi=-1e9;
+ vis.forEach(s=>s.y.forEach(v=>{if(v!=null){lo=Math.min(lo,v);hi=Math.max(hi,v)}}));
+ if(c.floor!=null)lo=Math.min(lo,c.floor);if(c.zero)lo=0;
+ const pad=(hi-lo)*.08||1;if(!c.zero)lo-=pad;hi+=pad;
+ const X=v=>m.l+(v-c.x0)/(c.x1-c.x0)*(W-m.l-m.r),Y=v=>H-m.b-(v-lo)/(hi-lo)*(H-m.t-m.b);
+ const g=mk("g",{},svg);
+ for(let i=0;i<=5;i++){const v=lo+(hi-lo)*i/5,y=Y(v);mk("line",{x1:m.l,x2:W-m.r,y1:y,y2:y,stroke:"#ffffff14"},g);mk("text",{x:m.l-8,y:y+4,"text-anchor":"end"},g).textContent=f(v,c.dy??1)}
+ c.ticks.forEach(([x,l])=>{mk("line",{x1:X(x),x2:X(x),y1:m.t,y2:H-m.b,stroke:"#ffffff0a"},g);mk("text",{x:X(x),y:H-10,"text-anchor":"middle"},g).textContent=l});
+ if(c.band)mk("path",{d:c.band(X,Y),fill:"#94a3b8",opacity:.18},svg);
+ if(c.hline)c.hline.forEach(h=>{mk("line",{x1:m.l,x2:W-m.r,y1:Y(h.v),y2:Y(h.v),stroke:h.c,"stroke-dasharray":"2 5","stroke-width":1.6},svg);mk("text",{x:W-m.r-4,y:Y(h.v)-6,"text-anchor":"end",style:"fill:"+h.c},svg).textContent=h.l});
+ if(c.mark!=null){mk("line",{x1:X(c.mark),x2:X(c.mark),y1:m.t,y2:H-m.b,stroke:"#fff","stroke-dasharray":"4 4",opacity:.35},svg);mk("text",{x:X(c.mark)+6,y:m.t+12},svg).textContent="Hari ini"}
+ const defs=mk("defs",{},svg);
+ vis.forEach((s,i)=>{
+  const pts=s.x.map((x,j)=>s.y[j]==null?null:[X(x),Y(s.y[j])]);
+  if(s.bar){const bw=(W-m.l-m.r)/(c.x1-c.x0+1)*(s.bw||.38);s.x.forEach((x,j)=>{if(s.y[j]==null)return;const [px,py]=pts[j];mk("rect",{x:px+(s.off2||0)-bw/2,y:py,width:bw,height:Math.max(0,Y(lo)-py),rx:2,fill:s.color,opacity:.9},svg)});return}
+  let d="",pen=0;pts.forEach(p=>{if(!p){pen=0;return}d+=(pen?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1);pen=1});
+  if(s.area){const id="a"+i+host.id,lg=mk("linearGradient",{id,x1:0,y1:0,x2:0,y2:1},defs);mk("stop",{offset:0,"stop-color":s.color,"stop-opacity":.35},lg);mk("stop",{offset:1,"stop-color":s.color,"stop-opacity":0},lg);
+   const q=pts.filter(Boolean);mk("path",{d:d+`L${q[q.length-1][0]} ${Y(lo)}L${q[0][0]} ${Y(lo)}Z`,fill:`url(#${id})`},svg)}
+  const p=mk("path",{d,fill:"none",stroke:s.color,"stroke-width":s.w||2.5,"stroke-linejoin":"round","stroke-linecap":"round","stroke-dasharray":s.dash||"",style:s.glow?`filter:drop-shadow(0 0 6px ${s.color})`:""},svg);
+  if(!c.noAnim){const L=p.getTotalLength?p.getTotalLength():0;if(L&&!s.dash){p.style.strokeDasharray=L;p.style.strokeDashoffset=L;p.getBoundingClientRect();p.style.transition="stroke-dashoffset 1.2s ease";p.style.strokeDashoffset=0}}
+  if(s.dots)pts.forEach((p,j)=>{if(!p)return;const big=s.big&&j==s.y.length-1;
+   mk("circle",{cx:p[0],cy:p[1],r:8,fill:s.color,class:"ring",style:`animation-delay:${j*.18}s`},svg);
+   mk("circle",{cx:p[0],cy:p[1],r:big?7:5.5,fill:s.color,stroke:"#06121c","stroke-width":2,class:"pr",style:`animation-delay:${j*.18}s;filter:drop-shadow(0 0 7px ${s.color})`},svg)});
+  else if(s.pt)pts.forEach(p=>p&&mk("circle",{cx:p[0],cy:p[1],r:3,fill:s.color},svg));
+ });
+ if(c.hl!=null){mk("line",{x1:X(c.hl),x2:X(c.hl),y1:m.t,y2:H-m.b,stroke:"#fff",opacity:.5},svg)}
+ const cl=mk("line",{y1:m.t,y2:H-m.b,stroke:"#fff","stroke-width":1,opacity:0},svg);
+ const ov=mk("rect",{x:m.l,y:m.t,width:W-m.l-m.r,height:H-m.t-m.b,fill:"transparent"},svg);
+ ov.addEventListener("mousemove",e=>{
+  const r=svg.getBoundingClientRect(),px=(e.clientX-r.left)/r.width*W,xv=c.x0+(px-m.l)/(W-m.l-m.r)*(c.x1-c.x0);
+  let rows="",near=null;
+  vis.forEach(s=>{let bj=-1,bd=1e9;s.x.forEach((x,j)=>{const dd=Math.abs(x-xv);if(s.y[j]!=null&&dd<bd){bd=dd;bj=j}});
+   if(bj<0||bd>(c.tol??.6))return;near=near==null?s.x[bj]:near;rows+=`<div><span><span class="s" style="background:${s.color}"></span>${s.name}</span><b class="mono">${f(s.y[bj],c.dy2??2)}</b></div>`});
+  if(near==null){T.style.opacity=0;cl.setAttribute("opacity",0);return}
+  cl.setAttribute("x1",X(near));cl.setAttribute("x2",X(near));cl.setAttribute("opacity",.4);
+  T.innerHTML=`<b>${c.label(near)}</b>${rows}`;T.style.opacity=1;
+  const hw=host.clientWidth,tx=X(near)/W*hw;T.style.left=(tx>hw*.65?tx-T.offsetWidth-14:tx+14)+"px";T.style.top="10px"});
+ ov.addEventListener("mouseleave",()=>{T.style.opacity=0;cl.setAttribute("opacity",0)});
+}
+function legend(el,series,redraw){el.innerHTML="";series.forEach(s=>{if(s.nolg)return;const c=document.createElement("div");c.className="chip"+(s.off?" off":"");c.innerHTML=`<i style="background:${s.color}"></i>${s.name}`;c.onclick=()=>{s.off=!s.off;legend(el,series,redraw);redraw()};el.appendChild(c)})}
+
+// ===== main chart =====
+const idx=P.map((_,i)=>i),mid=P.map(r=>{const d=new Date(r.t);return Math.round((d-new Date(d.getFullYear(),0,1))/864e5)+(+r.l.slice(3)==3?5:4)});
+const CV={R:"#22d3ee",F:"#a3e635",A:"#fbbf24",B:"#fb7185",T:"#a78bfa"};
+let mode="p",hl=null;
+const MAE=D.ev.filter(e=>e[1].startsWith("LSTM")).reduce((a,e)=>a+e[2],0)/D.ev.filter(e=>e[1].startsWith("LSTM")).length;
+const sP=[
+ {name:"BON A",color:CV.A,y:P.map(r=>r.a),w:2,dash:"6 5"},
+ {name:"BON B",color:CV.B,y:P.map(r=>r.b),w:2,dash:"6 5"},
+ {name:"RTOW",color:CV.T,y:P.map(r=>r.r),w:2,dash:"2 4"},
+ {name:"Realisasi",color:CV.R,y:P.map(r=>r.j=="realisasi"?r.tma:null),w:3,area:1},
+ {name:"Prediksi LSTM",color:CV.F,y:P.map((r,i)=>r.j=="prediksi"||i==fi-1?r.tma:null),w:3.5,glow:1}
+];
+const sF={name:"Titik prediksi",color:CV.F,y:P.map(r=>r.j=="prediksi"?r.tma:null),w:0,dots:1,big:1,nolg:1};
+const cache={};
+function build(m){
+ const doy=d=>Math.round((new Date(d)-new Date("2026-01-01"))/864e5);let series,c;
+ if(m){sP.forEach(s=>s.x=idx);sF.x=idx;series=[...sP,sF];
+  c={x0:-.3,x1:N-.7,ticks:idx.filter(i=>i%3==0).map(i=>[i,BL[i/3]]),label:i=>pl(P[i].l)+" 2026 · "+P[i].j,mark:fi-.5,
+   band:(X,Y)=>{const q=P.map((r,i)=>[i,r]).filter(([i,r])=>r.j=="prediksi"||i==fi-1);return "M"+q.map(([i,r])=>X(i)+" "+Y(r.tma+MAE)).join("L")+"L"+[...q].reverse().map(([i,r])=>X(i)+" "+Y(r.tma-MAE)).join("L")+"Z"},
+   hline:[{v:EK,c:"#ef4444",l:"Elevasi kekeringan "+f(EK,1)+" m"}],tol:.6,dy:1,dy2:3}}
+ else{
+  const dd=D.harian,days=[];for(let d=0;d<365;d++)days.push(d);
+  const pm=d=>{const dt=new Date(2026,0,1+d);return Math.min(N-1,dt.getMonth()*3+(dt.getDate()<=10?0:dt.getDate()<=20?1:2))};
+  const stp=k=>days.map(d=>P[pm(d)][k]),hx=dd.map(r=>doy(r[0]));
+  series=[{name:"BON A",color:CV.A,x:days,y:stp("a"),w:2,dash:"6 5"},{name:"BON B",color:CV.B,x:days,y:stp("b"),w:2,dash:"6 5"},{name:"RTOW",color:CV.T,x:days,y:stp("r"),w:2,dash:"2 4"},
+   {name:"Realisasi harian",color:CV.R,x:hx,y:dd.map(r=>r[1]),w:2.5,area:1},
+   {name:"Prediksi LSTM",color:CV.F,x:[hx[hx.length-1],...mid.slice(fi)],y:[cur,...P.slice(fi).map(r=>r.tma)],w:3.5,glow:1},
+   {name:"Titik prediksi",color:CV.F,x:mid.slice(fi),y:P.slice(fi).map(r=>r.tma),w:0,dots:1,big:1,nolg:1}];
+  c={x0:0,x1:364,ticks:BL.map((l,i)=>[Math.round((new Date(2026,i,1)-new Date(2026,0,1))/864e5),l]),label:x=>fd(new Date(2026,0,1+Math.round(x))),mark:hx[hx.length-1],hline:[{v:EK,c:"#ef4444",l:"Elevasi kekeringan "+f(EK,1)+" m"}],tol:3,dy:1,dy2:3}}
+ c.series=series;c.floor=EK-.3;return c}
+function drawMain(){const k=mode=="p"?1:0;cache[k]=cache[k]||build(mode=="p");cache[k].hl=hl;chart($("main"),cache[k]);legend($("leg"),cache[k].series,drawMain)}
+drawMain();
+$("tabs").onclick=e=>{const b=e.target.closest("button");if(!b)return;mode=b.dataset.m;[...$("tabs").children].forEach(x=>x.classList.toggle("on",x==b));drawMain()};
+
+// ===== tabel =====
+const REC=["Normal, pantau rutin","Waspada, hemat pelepasan","Siaga, batasi pelepasan"];
+let h='<tr><th>Periode</th><th>TMA prediksi</th><th>BON A</th><th>BON B</th><th>Jarak ke kekeringan</th><th>Status</th></tr>';
+P.slice(fi).forEach((r,k)=>{const s=stat(r.tma,r);h+=`<tr class="row" data-i="${fi+k}"><td><b>${pl(r.l)}</b><div class="sub">${fd(r.t)}</div></td><td class="mono"><b>${f(r.tma,2)}</b></td><td class="mono">${f(r.a,2)}</td><td class="mono">${f(r.b,2)}</td><td class="mono">${f(r.tma-EK,2)} m</td><td><span class="badge ${SC[s]}">${["Aman","Waspada","Siaga"][s]}</span><div class="sub">${REC[s]}</div></td></tr>`});
+$("tbl").innerHTML=h;
+$("tbl").onclick=e=>{const r=e.target.closest("tr.row");if(!r)return;hl=+r.dataset.i;mode="p";[...$("tabs").children].forEach((x,i)=>x.classList.toggle("on",!i));drawMain();$("main").scrollIntoView({behavior:"smooth",block:"center"})};
+
+// ===== akurasi =====
+const per=[...new Set(D.ev.map(e=>e[0]))];$("sel").innerHTML=per.map(p=>`<option value="${p}">${p.replace("-"," sampai ")}</option>`).join("");
+const MC={"LSTM (produksi)":"#a3e635","Persistensi":"#22d3ee","Tren linier":"#a78bfa","Naif musiman":"#fb923c","Klimatologi":"#fb7185"};
+function acc(){const rows=D.ev.filter(e=>e[0]==$("sel").value).sort((a,b)=>a[2]-b[2]),mx=Math.max(...rows.map(r=>r[2]));
+ $("acc").innerHTML=rows.map(r=>`<div class="mrow ${r[1].startsWith("LSTM")?"me":""}"><span>${r[1].replace(" (produksi)","")}</span><div class="bar"><i style="width:${r[2]/mx*100}%;background:${MC[r[1]]}"></i></div><span class="mono">${f(r[2],2)} m</span></div>`).join("");
+ const b=rows.find(r=>r[1].startsWith("LSTM")),o=rows.filter(r=>r!==b).sort((a,b)=>a[2]-b[2])[0];
+ $("accn").innerHTML=`LSTM galat ${f(b[2],2)} m, ${f((1-b[2]/o[2])*100,0)}% lebih rendah dari metode pembanding terbaik (${o[1]}). Validasi realisasi Jul sampai Sep 2026: ${D.acc.filter(a=>a.ok).length} dari ${D.acc.length} periode status BON sesuai, galat rata rata ${f(D.acc.reduce((s,a)=>s+Math.abs(a.e),0)/D.acc.length,2)} m.`}
+$("sel").onchange=acc;acc();
+
+// ===== neraca =====
+const xi=idx,sN=[{name:"Ketersediaan air",color:"#14b8a6",x:xi,y:D.kt,bar:1,bw:.4,off2:-4},{name:"Kebutuhan air",color:"#fb923c",x:xi,y:D.kb,bar:1,bw:.4,off2:4}];
+const tk=idx.filter(i=>i%3==0).map(i=>[i,BL[i/3]]);
+const drN=()=>chart($("nera"),{series:sN,x0:-.5,x1:N-.5,ticks:tk,label:i=>pl(P[i].l),zero:1,h:300,w:640,tol:.6,dy:0,dy2:2,noAnim:1,mark:fi-.5});
+drN();legend($("leg2"),sN,drN);
+const def=P.map((r,i)=>[r.l,D.kt[i]-D.kb[i]]).filter(a=>a[1]<0);
+$("neran").textContent=def.length?"Periode defisit: "+def.map(a=>pl(a[0])).join(", "):"Ketersediaan air mencukupi kebutuhan pada seluruh periode.";
+// ===== konteks =====
+const yc={2024:"#fb923c",2025:"#c084fc"};
+const sC=[...Object.keys(D.yrs).map(y=>({name:"Tahun "+y,color:yc[y],x:xi,y:D.yrs[y],w:2})),
+ {name:"Realisasi 2026",color:CV.R,x:xi,y:sP[3].y,w:3.2},{name:"Prediksi 2026",color:CV.F,x:xi,y:sP[4].y,w:3.5,glow:1}];
+const drC=()=>chart($("ctx"),{series:sC,x0:-.3,x1:N-.7,ticks:tk,label:i=>pl(P[i].l),h:300,w:640,tol:.6,dy:1,dy2:2,noAnim:1,mark:fi-.5,hline:[{v:EK,c:"#ef4444",l:"Elevasi kekeringan"}],floor:EK-.3});
+drC();legend($("leg3"),sC,drC);
+$("ctxn").textContent="Hanya data sensor yang valid ditampilkan. Data sebelum pertengahan 2024 bernilai konstan 87,52 m sehingga dikeluarkan dari pembanding. TMA Okt 2026 sebesar "+f(P[fi-1].tma,2)+" m, "+f(Math.abs(P[fi-1].tma-D.yrs[2025][fi-1]),2)+" m "+(P[fi-1].tma<D.yrs[2025][fi-1]?"di bawah":"di atas")+" Okt 2025.";
+</script></body></html>
