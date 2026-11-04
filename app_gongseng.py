@@ -28,7 +28,9 @@ st.set_page_config(page_title="Gongseng, Prediksi TMA", page_icon="🌊", layout
 st.markdown("""<style>
 .stApp{background:radial-gradient(1000px 500px at 85% -10%,#0f4c5c66,transparent),#06121c}
 .stApp,.stApp p,.stApp li,.stApp label,.stApp span,.stApp h1,.stApp h2,.stApp h3,.stApp h4{color:#eaf6fb}
-.block-container{padding-top:1.4rem;max-width:1400px}
+header[data-testid=stHeader]{background:#06121c}
+[data-testid=stToolbar] *,[data-testid=stHeader] button,[data-testid=stHeader] svg{color:#8fb3c7!important;fill:#8fb3c7}
+.block-container{padding-top:3.2rem;max-width:1400px}
 [data-testid=stMetric]{background:linear-gradient(180deg,#11324a,#0d2638);border:1px solid #1f4560;border-radius:14px;padding:12px 16px}
 [data-testid=stMetricLabel] p{color:#8fb3c7!important;font-weight:700}
 [data-testid=stMetricValue],[data-testid=stMetricValue] *{font-weight:800;color:#ffffff!important}
